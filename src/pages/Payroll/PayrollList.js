@@ -1,210 +1,133 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
-import { Link } from "react-router-dom";
 
 function PayrollList() {
   const [payrolls, setPayrolls] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
 
   useEffect(() => {
     loadPayroll();
   }, []);
 
   const loadPayroll = async () => {
-    try {
-      const res = await api.get("payroll/");
-      setPayrolls(res.data);
-    } catch (err) {
-      console.error("Payroll load error:", err);
-    }
-  };
-
-  const generateAll = async () => {
-    if (!month || !year) {
-      alert("Please select month & year");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await api.post("payroll/generate_all_payroll/", {
-        month: Number(month),
-        year: Number(year),
-      });
-      alert("Payroll generation started!");
-      loadPayroll();
-    } catch (error) {
-      console.error("Generate all payroll error:", error);
-      alert("Failed");
-    }
-    setLoading(false);
+    const res = await api.get("payroll/");
+    setPayrolls(res.data);
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.heading}>Payroll Management</h2>
+    <div className="page">
+      <h2 className="title">📊 Payroll Records</h2>
 
-        {/* Controls Row */}
-        <div style={styles.controlsRow}>
-          <select
-            style={styles.select}
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-          >
-            <option value="">Month</option>
-            {[...Array(12)].map((_, i) => (
-              <option value={i + 1} key={i}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Month</th>
+            <th>Gross Salary</th>
+            <th>Net Salary</th>
+            <th>Payslip</th>
+          </tr>
+        </thead>
 
-          <select
-            style={styles.select}
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          >
-            <option value="">Year</option>
-            {[2024, 2025, 2026].map((y) => (
-              <option value={y} key={y}>
-                {y}
-              </option>
-            ))}
-          </select>
+        <tbody>
+          {payrolls.map((row) => (
+            <tr key={row.id} className="row">
+              <td>
+                <strong>{row.employee_name}</strong>
+                <br />
+                <small>ID: {row.employee_code}</small>
+              </td>
 
-          <button
-            onClick={generateAll}
-            disabled={loading}
-            style={styles.generateBtn}
-          >
-            Generate All
-          </button>
+              <td>
+                <span className="badge-blue">
+                  {row.month_name} {row.year}
+                </span>
+              </td>
 
-          <Link to="/payroll/add" style={styles.addBtn}>
-            Add Payroll
-          </Link>
-        </div>
+              <td>₹ {row.gross_salary}</td>
+              <td className="salary-green">₹ {row.net_salary}</td>
 
-        {/* Table */}
-        <table style={styles.table}>
-          <thead>
-            <tr style={styles.theadRow}>
-              <th style={styles.th}>Employee</th>
-              <th style={styles.th}>Month</th>
-              <th style={styles.th}>Basic</th>
-              <th style={styles.th}>Net</th>
-              <th style={styles.th}>Payslip</th>
+              <td>
+                <a
+                  className="download-link"
+                  href={`https://cloud-hrms-1.onrender.com/api/payroll/download/${row.id}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  📄 Download
+                </a>
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
 
-          <tbody>
-            {payrolls.map((p) => (
-              <tr key={p.id} style={styles.tr}>
-                <td style={styles.td}>{p.employee_name}</td>
-                <td style={styles.td}>
-                  {p.month}/{p.year}
-                </td>
-                <td style={styles.td}>₹ {p.basic_salary}</td>
-                <td style={styles.td}>₹ {p.net_salary}</td>
-                <td style={styles.td}>
-                  <a
-                    href={`http://localhost:8000/api/payroll/download/${p.id}/`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={styles.link}
-                  >
-                    📄 PDF
-                  </a>{" "}
-                  |{" "}
-                  <Link to={`/employee/${p.employee}/salary`} style={styles.link}>
-                    🔍 View
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Styling */}
+      <style>{`
+        .page {
+          padding: 25px;
+          background: #f3f4f6;
+          min-height: 100vh;
+        }
+
+        .title {
+          font-size: 28px;
+          font-weight: bold;
+          color: #1e3a8a;
+          margin-bottom: 20px;
+        }
+
+        .styled-table {
+          width: 100%;
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        th {
+          background: #1e3a8a;
+          color: white;
+          padding: 12px;
+        }
+
+        td {
+          padding: 12px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .row:hover {
+          background: #f0f9ff;
+          transition: 0.2s;
+        }
+
+        .badge-blue {
+          background: #2563eb;
+          color: white;
+          padding: 4px 10px;
+          border-radius: 8px;
+          font-size: 12px;
+        }
+
+        .salary-green {
+          color: #047857;
+          font-weight: bold;
+        }
+
+        .download-link {
+          background: #059669;
+          padding: 6px 12px;
+          color: white;
+          border-radius: 8px;
+          font-size: 14px;
+          text-decoration: none;
+        }
+
+        .download-link:hover {
+          background: #047857;
+        }
+      `}</style>
     </div>
   );
 }
-
-/* ---- Styles ---- */
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#f4f7fc",
-    padding: "40px",
-    display: "flex",
-    justifyContent: "center",
-  },
-  card: {
-    width: "100%",
-    maxWidth: "1000px",
-    background: "#fff",
-    padding: "30px",
-    borderRadius: "15px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: 700,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#334155",
-  },
-  controlsRow: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 20,
-  },
-  select: {
-    padding: "10px",
-    borderRadius: "10px",
-    border: "1px solid #ccc",
-    fontSize: "15px",
-  },
-  generateBtn: {
-    background: "#059669",
-    color: "white",
-    padding: "10px 16px",
-    borderRadius: "10px",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  addBtn: {
-    background: "#2563eb",
-    color: "white",
-    padding: "10px 16px",
-    borderRadius: "10px",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  th: {
-    background: "#2563eb",
-    color: "white",
-    padding: "12px",
-    textAlign: "left",
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #e5e7eb",
-  },
-  tr: {
-    transition: "0.2s",
-  },
-  link: {
-    textDecoration: "none",
-    color: "#2563eb",
-    fontWeight: 600,
-  },
-};
 
 export default PayrollList;

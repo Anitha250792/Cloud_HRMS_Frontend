@@ -6,22 +6,22 @@ function EditEmployee() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [employee, setEmployee] = useState({
-    name: "",
-    email: "",
-    department: "",
-    salary: "",
-    is_active: true,
-  });
+  const [employee, setEmployee] = useState(null);
 
   useEffect(() => {
     loadEmployee();
   }, []);
 
   const loadEmployee = async () => {
-    const res = await api.get(`employees/${id}/`);
-    setEmployee(res.data);
+    try {
+      const res = await api.get(`employees/${id}/`);
+      setEmployee(res.data);
+    } catch (error) {
+      console.error("Error loading employee", error);
+    }
   };
+
+  if (!employee) return <h2 style={{ padding: 50 }}>Loading...</h2>;
 
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
@@ -29,9 +29,15 @@ function EditEmployee() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await api.put(`employees/${id}/`, employee);
-    alert("Employee updated successfully!");
-    navigate("/employees");
+
+    try {
+      await api.put(`employees/${id}/`, employee);
+      alert("Employee updated successfully!");
+      navigate("/employees");
+    } catch (error) {
+      console.error("Error updating employee", error);
+      alert("Update failed!");
+    }
   };
 
   return (
@@ -78,15 +84,13 @@ function EditEmployee() {
 
           <label style={label}>Status</label>
           <select
-            name="is_active"
-            value={employee.is_active}
-            onChange={(e) =>
-              setEmployee({ ...employee, is_active: e.target.value === "true" })
-            }
+            name="status"
+            value={employee.status}
+            onChange={handleChange}
             style={input}
           >
-            <option value={true}>Active</option>
-            <option value={false}>Inactive</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
 
           <button style={saveButton}>✔ Save Changes</button>
@@ -96,7 +100,7 @@ function EditEmployee() {
   );
 }
 
-/* Styles */
+/* ---------- Styles ---------- */
 const wrapper = {
   paddingTop: 90,
   padding: 20,
