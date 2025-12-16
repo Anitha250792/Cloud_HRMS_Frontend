@@ -2,136 +2,184 @@ import { useEffect, useState } from "react";
 import api from "../../api/api";
 
 function LeaveList() {
-  const [leave, setLeave] = useState([]);
+  const [leaves, setLeaves] = useState([]);
 
   useEffect(() => {
-    loadLeave();
+    loadLeaves();
   }, []);
 
-  const loadLeave = async () => {
+  const loadLeaves = async () => {
     try {
-      const res = await api.get("/leaves/");
-      setLeave(res.data);
+      const res = await api.get("leave/");
+      setLeaves(res.data);
     } catch (err) {
-      console.error("Failed to load leaves:", err);
+      console.error(err);
     }
   };
 
   return (
-    <div style={styles.pageContainer}>
+    <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.heading}>Leave List</h2>
+        <h2 style={styles.heading}>📋 Leave Management</h2>
 
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>ID</th>
-              <th style={styles.th}>Employee</th>
-              <th style={styles.th}>Type</th>
-              <th style={styles.th}>Dates</th>
-              <th style={styles.th}>Reason</th>
-              <th style={styles.th}>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {leave.map((l) => (
-              <tr key={l.id} style={styles.tr}>
-                <td style={styles.td}>{l.id}</td>
-                <td style={styles.td}>{l.employee_name}</td>
-                <td style={styles.td}>{l.leave_type}</td>
-                <td style={styles.td}>
-                  {l.start_date} → {l.end_date}
-                </td>
-                <td style={styles.td}>{l.reason}</td>
-                <td style={styles.td}>
-                  <span
-                    style={{
-                      ...styles.status,
-                      backgroundColor:
-                        l.status === "APPROVED"
-                          ? "#d4edda"
-                          : l.status === "REJECTED"
-                          ? "#f8d7da"
-                          : "#fff3cd",
-                      color:
-                        l.status === "APPROVED"
-                          ? "#155724"
-                          : l.status === "REJECTED"
-                          ? "#721c24"
-                          : "#856404",
-                    }}
-                  >
-                    {l.status}
-                  </span>
-                </td>
+        <div style={styles.tableWrap}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>ID</th>
+                <th style={styles.th}>Employee</th>
+                <th style={styles.th}>Type</th>
+                <th style={styles.th}>Dates</th>
+                <th style={styles.th}>Reason</th>
+                <th style={styles.th}>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {leaves.map((l, index) => (
+                <tr
+                  key={l.id}
+                  style={{
+                    ...styles.tr,
+                    background: index % 2 === 0 ? "#ffffff" : "#f9fafb",
+                  }}
+                >
+                  <td style={styles.td}>{l.id}</td>
+                  <td style={{ ...styles.td, fontWeight: 600 }}>
+                    {l.employee_name}
+                  </td>
+                  <td style={styles.td}>{l.leave_type}</td>
+                  <td style={styles.td}>
+                    {l.start_date} → {l.end_date}
+                  </td>
+                  <td style={styles.td}>{l.reason}</td>
+                  <td style={styles.td}>
+                    <span
+                      style={{
+                        ...styles.badge,
+                        ...statusStyle[l.status],
+                      }}
+                    >
+                      {statusIcon[l.status]} {l.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+
+              {leaves.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={styles.empty}>
+                    No leave records found 💤
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
 
-/* 🎨 Styles */
+export default LeaveList;
+
+/* ===================== STYLES ===================== */
+
 const styles = {
-  pageContainer: {
-    padding: "40px",
+  page: {
+    minHeight: "100vh",
+    padding: 40,
+    background: "linear-gradient(135deg,#eef2ff,#f0fdf4)",
     display: "flex",
     justifyContent: "center",
-    background: "#f4f7fc",
-    minHeight: "100vh",
   },
 
   card: {
     width: "100%",
-    maxWidth: "900px",
-    background: "#fff",
-    padding: "30px",
-    borderRadius: "15px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+    maxWidth: 1100,
+    background: "#ffffff",
+    padding: 30,
+    borderRadius: 18,
+    boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
   },
 
   heading: {
-    fontSize: "28px",
-    fontWeight: "700",
-    marginBottom: "20px",
-    color: "#333",
     textAlign: "center",
+    fontSize: 28,
+    fontWeight: 800,
+    marginBottom: 25,
+    color: "#1e293b",
+  },
+
+  tableWrap: {
+    overflowX: "auto",
+    borderRadius: 14,
   },
 
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: "10px",
   },
 
   th: {
-    padding: "12px",
-    background: "#0d6efd",
+    position: "sticky",
+    top: 0,
+    background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
     color: "#fff",
-    fontWeight: "600",
-    border: "1px solid #ddd",
+    padding: "14px",
+    fontSize: 14,
     textAlign: "left",
-  },
-
-  td: {
-    padding: "12px",
-    border: "1px solid #ddd",
-    background: "#fff",
+    zIndex: 1,
   },
 
   tr: {
-    transition: "0.2s ease",
+    transition: "all 0.2s ease",
   },
 
-  status: {
-    padding: "6px 12px",
-    borderRadius: "8px",
-    fontWeight: "600",
-    display: "inline-block",
+  td: {
+    padding: "14px",
+    fontSize: 14,
+    color: "#334155",
+  },
+
+  badge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "6px 14px",
+    borderRadius: 999,
+    fontSize: 13,
+    fontWeight: 700,
+  },
+
+  empty: {
+    textAlign: "center",
+    padding: 30,
+    fontSize: 16,
+    color: "#64748b",
+    fontWeight: 600,
   },
 };
 
-export default LeaveList;
+/* ===== Status Colors & Icons ===== */
+
+const statusStyle = {
+  APPROVED: {
+    background: "#dcfce7",
+    color: "#166534",
+  },
+  REJECTED: {
+    background: "#fee2e2",
+    color: "#7f1d1d",
+  },
+  PENDING: {
+    background: "#fef9c3",
+    color: "#854d0e",
+  },
+};
+
+const statusIcon = {
+  APPROVED: "✔",
+  REJECTED: "✖",
+  PENDING: "⏳",
+};

@@ -1,3 +1,4 @@
+import './index.css'; 
 import { GoogleLogin } from "@react-oauth/google";
 import React from "react";
 import { createRoot } from "react-dom/client";

@@ -1,155 +1,174 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/api";
 
 function EditEmployee() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [employee, setEmployee] = useState(null);
+  const [form, setForm] = useState({
+    emp_code: "",
+    name: "",
+    email: "",
+    department: "",
+    role: "",
+    salary: "",
+    date_joined: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    loadEmployee();
-  }, []);
+    api
+      .get("employees/")
+      .then((res) => {
+        const emp = res.data.find((e) => e.id === Number(id));
+        if (!emp) {
+          setError("Employee not found");
+        } else {
+          setForm(emp);
+        }
+      })
+      .catch(() => setError("Failed to load employee"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const loadEmployee = async () => {
-    try {
-      const res = await api.get(`employees/${id}/`);
-      setEmployee(res.data);
-    } catch (error) {
-      console.error("Error loading employee", error);
-    }
-  };
-
-  if (!employee) return <h2 style={{ padding: 50 }}>Loading...</h2>;
-
-  const handleChange = (e) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
+    setError("");
 
     try {
-      await api.put(`employees/${id}/`, employee);
-      alert("Employee updated successfully!");
+      await api.put(`employees/update/${id}/`, {
+        ...form,
+        salary: Number(form.salary),
+      });
+      alert("✅ Employee updated successfully");
       navigate("/employees");
-    } catch (error) {
-      console.error("Error updating employee", error);
-      alert("Update failed!");
+    } catch (err) {
+      setError("❌ Failed to update employee");
+    } finally {
+      setSaving(false);
     }
   };
 
+  if (loading) return <p style={loadingText}>Loading employee...</p>;
+
   return (
     <div style={wrapper}>
-      <div style={card}>
-        <h2 style={title}>Edit Employee</h2>
+      <h2 style={title}>✏️ Edit Employee</h2>
 
-        <form onSubmit={handleSubmit} style={form}>
-          <label style={label}>Name</label>
-          <input
-            type="text"
-            name="name"
-            value={employee.name}
-            onChange={handleChange}
-            style={input}
-          />
+      <form style={formBox} onSubmit={handleSubmit}>
+        {error && <p style={errorBox}>{error}</p>}
 
-          <label style={label}>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={employee.email}
-            onChange={handleChange}
-            style={input}
-          />
+        {Object.keys(form).map((field) => (
+          <div style={formGroup} key={field}>
+            <label style={label}>
+              {field.replace("_", " ").toUpperCase()}
+            </label>
+            <input
+              type={
+                field === "date_joined"
+                  ? "date"
+                  : field === "salary"
+                  ? "number"
+                  : "text"
+              }
+              name={field}
+              value={form[field]}
+              onChange={handleChange}
+              style={input}
+              required
+            />
+          </div>
+        ))}
 
-          <label style={label}>Department</label>
-          <input
-            type="text"
-            name="department"
-            value={employee.department}
-            onChange={handleChange}
-            style={input}
-          />
-
-          <label style={label}>Salary</label>
-          <input
-            type="number"
-            name="salary"
-            value={employee.salary}
-            onChange={handleChange}
-            style={input}
-          />
-
-          <label style={label}>Status</label>
-          <select
-            name="status"
-            value={employee.status}
-            onChange={handleChange}
-            style={input}
-          >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-
-          <button style={saveButton}>✔ Save Changes</button>
-        </form>
-      </div>
+        <button style={button} disabled={saving}>
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </form>
     </div>
   );
 }
 
-/* ---------- Styles ---------- */
+export default EditEmployee;
+
+/* ================= STYLES ================= */
+
+const loadingText = {
+  textAlign: "center",
+  marginTop: 80,
+  fontSize: 18,
+  fontWeight: 600,
+  color: "#065f46",
+};
+
 const wrapper = {
-  paddingTop: 90,
-  padding: 20,
   minHeight: "100vh",
+  padding: "90px 24px",
   background: "linear-gradient(135deg,#ecfdf3,#d1fae5)",
 };
 
-const card = {
-  maxWidth: 500,
-  margin: "auto",
-  background: "white",
-  padding: 25,
-  borderRadius: 16,
-  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-};
-
 const title = {
-  marginBottom: 20,
+  fontSize: 26,
+  fontWeight: 800,
   color: "#065f46",
-  fontWeight: 700,
+  marginBottom: 25,
+  textAlign: "center",
 };
 
-const form = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
+const formBox = {
+  maxWidth: 520,
+  margin: "0 auto",
+  background: "#fff",
+  padding: 28,
+  borderRadius: 16,
+  boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+};
+
+const formGroup = {
+  marginBottom: 16,
 };
 
 const label = {
-  fontSize: 14,
+  display: "block",
+  marginBottom: 6,
   fontWeight: 600,
-  color: "#064e3b",
+  color: "#065f46",
+  fontSize: 14,
 };
 
 const input = {
+  width: "100%",
   padding: 10,
-  borderRadius: 10,
-  border: "1px solid #d1d5db",
+  borderRadius: 8,
+  border: "1px solid #cbd5e1",
+  fontSize: 14,
 };
 
-const saveButton = {
+const button = {
+  width: "100%",
+  padding: 12,
   background: "#059669",
   color: "white",
-  border: "none",
-  padding: "12px 16px",
   borderRadius: 10,
-  marginTop: 8,
-  fontWeight: 700,
+  fontSize: 16,
+  border: "none",
   cursor: "pointer",
+  marginTop: 10,
 };
 
-export default EditEmployee;
+const errorBox = {
+  background: "#fee2e2",
+  color: "#991b1b",
+  padding: 10,
+  borderRadius: 8,
+  marginBottom: 16,
+  fontWeight: 600,
+  textAlign: "center",
+};

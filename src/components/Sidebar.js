@@ -1,193 +1,303 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
+import {
+  FiHome,
+  FiUsers,
+  FiClock,
+  FiCalendar,
+  FiFileText,
+  FiLogOut,
+  FiChevronDown,
+  FiChevronRight,
+  FiDollarSign,
+  FiFolder,
+} from "react-icons/fi";
+
+/* 🎨 COLORS */
+const COLORS = {
+  primary: "#2563EB",
+  highlight: "#BFDBFE",
+  lightBlue: "#EFF6FF",
+  border: "#E5E7EB",
+  textDark: "#1E3A8A",
+};
 
 function Sidebar() {
   const location = useLocation();
+  const role = localStorage.getItem("role"); // HR | EMPLOYEE
   const [collapsed, setCollapsed] = useState(false);
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  // ✅ ONE dropdown open at a time (simple + reliable)
+  const [openMenu, setOpenMenu] = useState(null);
+
+  const toggleMenu = (menu) => {
+    setOpenMenu(openMenu === menu ? null : menu);
+  };
+
+  const isActive = (path) => location.pathname === path;
+  const isGroupActive = (path) => location.pathname.startsWith(path);
+
+  const logout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
 
   return (
-    <aside
-      style={{
-        width: collapsed ? "70px" : "220px",
-        transition: "0.3s",
-        background: "#065f46",
-        color: "white",
-        height: "100vh",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        paddingTop: "80px",
-        boxShadow: "3px 0 10px rgba(0,0,0,0.15)",
-        zIndex: 1000,
-      }}
-    >
-      {/* Collapse button */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        style={{
-          position: "absolute",
-          top: 20,
-          right: -15,
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
-          background: "#064e3b",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-          fontSize: 14,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        }}
-      >
-        {collapsed ? "»" : "«"}
+    <aside style={styles.sidebar(collapsed)}>
+      {/* Collapse */}
+      <button style={styles.collapseBtn} onClick={() => setCollapsed(!collapsed)}>
+        {collapsed ? "›" : "‹"}
       </button>
 
-      {/* Menu List */}
-      <nav style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-        <MenuItem
+      <nav>
+        {/* DASHBOARD */}
+        <MenuLink
+          icon={<FiHome />}
           label="Dashboard"
-          icon="📊"
-          to="/"
-          active={isActive("/")}
+          to={role === "HR" ? "/admin-dashboard" : "/employee-dashboard"}
+          active={
+            isGroupActive("/admin-dashboard") ||
+            isGroupActive("/employee-dashboard")
+          }
           collapsed={collapsed}
         />
 
-        <MenuSection title="EMPLOYEES" collapsed={collapsed} />
-        <MenuItem
-          label="Employee List"
-          icon="👥"
-          to="/employees"
-          active={isActive("/employees")}
-          collapsed={collapsed}
-        />
-        <MenuItem
-          label="Add Employee"
-          icon="➕"
-          to="/employees/add"
-          active={isActive("/employees/add")}
-          collapsed={collapsed}
-        />
+        {/* ================= HR ================= */}
+        {role === "HR" && (
+          <>
+            <Dropdown
+              title="Employees"
+              icon={<FiUsers />}
+              open={openMenu === "employees"}
+              onClick={() => toggleMenu("employees")}
+              active={isGroupActive("/employees")}
+              collapsed={collapsed}
+            >
+              <SubLink to="/employees" label="Employee List" active={isActive("/employees")} />
+              <SubLink to="/employees/add" label="Add Employee" active={isActive("/employees/add")} />
+            </Dropdown>
 
-        <MenuSection title="PAYROLL" collapsed={collapsed} />
-        <MenuItem
-          label="Payroll Records"
-          icon="💰"
-          to="/payroll"
-          active={isActive("/payroll")}
-          collapsed={collapsed}
-        />
-        <MenuItem
-          label="Generate Payroll"
-          icon="⚙️"
-          to="/payroll/add"
-          active={isActive("/payroll/add")}
-          collapsed={collapsed}
-        />
+            <Dropdown
+              title="Attendance"
+              icon={<FiClock />}
+              open={openMenu === "attendance"}
+              onClick={() => toggleMenu("attendance")}
+              active={isGroupActive("/attendance")}
+              collapsed={collapsed}
+            >
+              <SubLink to="/attendance" label="Attendance Logs" active={isActive("/attendance")} />
+              <SubLink
+                to="/attendance/working-hours"
+                label="Working Hours"
+                active={isActive("/attendance/working-hours")}
+              />
+            </Dropdown>
 
-        <MenuSection title="ATTENDANCE" collapsed={collapsed} />
-        <MenuItem
-          label="Check-in/Out"
-          icon="⏱"
-          to="/attendance/actions"
-          active={isActive("/attendance/actions")}
-          collapsed={collapsed}
-        />
-        <MenuItem
-          label="Attendance Records"
-          icon="📋"
-          to="/attendance"
-          active={isActive("/attendance")}
-          collapsed={collapsed}
-        />
+            <Dropdown
+              title="Payroll"
+              icon={<FiDollarSign />}
+              open={openMenu === "payroll"}
+              onClick={() => toggleMenu("payroll")}
+              active={isGroupActive("/payroll")}
+              collapsed={collapsed}
+            >
+              <SubLink to="/payroll" label="Payroll Records" active={isActive("/payroll")} />
+              <SubLink to="/payroll/add" label="Generate Payroll" active={isActive("/payroll/add")} />
+            </Dropdown>
 
-        <MenuSection title="LEAVES" collapsed={collapsed} />
-        <MenuItem
-          label="Leave Requests"
-          icon="📝"
-          to="/leave"
-          active={isActive("/leave")}
-          collapsed={collapsed}
-        />
-        <MenuItem
-          label="Apply Leave"
-          icon="🟢"
-          to="/leave/apply"
-          active={isActive("/leave/apply")}
-          collapsed={collapsed}
-        />
-        <MenuItem
-          label="Approve Leaves"
-          icon="✔️"
-          to="/leave/approve"
-          active={isActive("/leave/approve")}
-          collapsed={collapsed}
-        />
+            <Dropdown
+              title="Leaves"
+              icon={<FiCalendar />}
+              open={openMenu === "leaves"}
+              onClick={() => toggleMenu("leaves")}
+              active={isGroupActive("/leave")}
+              collapsed={collapsed}
+            >
+              <SubLink to="/leave/approve" label="Approve Leaves" active={isActive("/leave/approve")} />
+            </Dropdown>
 
-        {/* Logout */}
-        <MenuItem
-          label="Logout"
-          icon="🚪"
-          to="#"
-          collapsed={collapsed}
-          active={false}
-          onClick={() => {
-            localStorage.removeItem("access");
-            localStorage.removeItem("refresh");
-            localStorage.removeItem("google_name");
-            localStorage.removeItem("google_picture");
-            window.location.href = "/login";
-          }}
-        />
+            <Dropdown
+              title="Documents"
+              icon={<FiFolder />}
+              open={openMenu === "documents"}
+              onClick={() => toggleMenu("documents")}
+              active={isGroupActive("/documents")}
+              collapsed={collapsed}
+            >
+              <SubLink
+                to="/documents/hr-view"
+                label="Employee Documents"
+                active={isActive("/documents/hr-view")}
+              />
+            </Dropdown>
+          </>
+        )}
+
+        {/* ================= EMPLOYEE ================= */}
+        {role === "EMPLOYEE" && (
+          <>
+            <Dropdown
+              title="Attendance"
+              icon={<FiClock />}
+              open={openMenu === "attendance"}
+              onClick={() => toggleMenu("attendance")}
+              active={isGroupActive("/attendance")}
+              collapsed={collapsed}
+            >
+              <SubLink
+                to="/attendance/actions"
+                label="Check In / Out"
+                active={isActive("/attendance/actions")}
+              />
+              <SubLink
+                to="/attendance"
+                label="My Records"
+                active={isActive("/attendance")}
+              />
+            </Dropdown>
+
+            <Dropdown
+              title="Leaves"
+              icon={<FiCalendar />}
+              open={openMenu === "leaves"}
+              onClick={() => toggleMenu("leaves")}
+              active={isGroupActive("/leave")}
+              collapsed={collapsed}
+            >
+              <SubLink to="/leave" label="My Leaves" active={isActive("/leave")} />
+              <SubLink to="/leave/apply" label="Apply Leave" active={isActive("/leave/apply")} />
+            </Dropdown>
+          </>
+        )}
+
+        {/* LOGOUT */}
+        <div style={styles.logout} onClick={logout}>
+          <FiLogOut />
+          {!collapsed && <span>Logout</span>}
+        </div>
       </nav>
     </aside>
   );
 }
 
-/* ------------------ MENU ITEM (FINAL VERSION) ------------------ */
-function MenuItem({ label, icon, to, active, collapsed, onClick }) {
+/* ================= COMPONENTS ================= */
+
+function MenuLink({ icon, label, to, active, collapsed }) {
   return (
-    <Link
-      to={to}
-      onClick={onClick}
-      style={{
-        padding: "10px 16px",
-        margin: "2px 10px",
-        borderRadius: 8,
-        textDecoration: "none",
-        color: "white",
-        fontWeight: active ? 700 : 500,
-        background: active ? "rgba(255,255,255,0.2)" : "transparent",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        transition: "0.2s",
-        fontSize: 14,
-      }}
-    >
-      <span style={{ fontSize: 18 }}>{icon}</span>
+    <Link to={to} style={styles.link(active)}>
+      {icon}
       {!collapsed && <span>{label}</span>}
     </Link>
   );
 }
 
-/* ------------------ SECTION TITLE ------------------ */
-function MenuSection({ title, collapsed }) {
-  if (collapsed) return null;
+function Dropdown({ title, icon, open, onClick, active, children, collapsed }) {
   return (
-    <p
-      style={{
-        margin: "15px 20px 5px",
-        color: "#d1fae5",
-        fontSize: 12,
-        letterSpacing: "0.05em",
-        fontWeight: 600,
-      }}
-    >
-      {title}
-    </p>
+    <div>
+      <div style={styles.dropdownHead(active)} onClick={onClick}>
+        {icon}
+        {!collapsed && <span>{title}</span>}
+        {!collapsed && (open ? <FiChevronDown /> : <FiChevronRight />)}
+      </div>
+
+      {open && !collapsed && (
+        <div style={styles.dropdownBody}>{children}</div>
+      )}
+    </div>
   );
 }
+
+function SubLink({ to, label, active }) {
+  return (
+    <Link to={to} style={styles.subLink(active)}>
+      {label}
+    </Link>
+  );
+}
+
+/* ================= STYLES ================= */
+
+const styles = {
+  sidebar: (collapsed) => ({
+    width: collapsed ? 70 : 240,
+    background: COLORS.primary,
+    height: "100vh",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    paddingTop: 80,
+    transition: "0.3s",
+  }),
+
+  collapseBtn: {
+    position: "absolute",
+    top: 20,
+    right: -12,
+    width: 26,
+    height: 26,
+    borderRadius: "50%",
+    border: `1px solid ${COLORS.border}`,
+    background: "#fff",
+    cursor: "pointer",
+  },
+
+  link: (active) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "10px 16px",
+    margin: "4px 12px",
+    borderRadius: 10,
+    textDecoration: "none",
+    color: active ? COLORS.textDark : "#fff",
+    background: active ? COLORS.highlight : "transparent",
+    fontWeight: 600,
+  }),
+
+  dropdownHead: (active) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "10px 16px",
+    margin: "6px 12px",
+    borderRadius: 10,
+    cursor: "pointer",
+    background: active ? COLORS.highlight : "rgba(255,255,255,0.15)",
+    color: active ? COLORS.textDark : "#fff",
+    fontWeight: 600,
+  }),
+
+  dropdownBody: {
+    marginLeft: 36,
+    marginTop: 6,
+    marginBottom: 6,
+    padding: 8,
+    borderRadius: 10,
+    background: COLORS.lightBlue,
+  },
+
+  subLink: (active) => ({
+    display: "block",
+    padding: "6px 10px",
+    marginBottom: 4,
+    borderRadius: 8,
+    textDecoration: "none",
+    background: active ? COLORS.primary : "transparent",
+    color: active ? "#fff" : "#1F2937",
+    fontWeight: active ? 600 : 500,
+  }),
+
+  logout: {
+    margin: 16,
+    padding: 10,
+    borderRadius: 10,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    color: "#DC2626",
+    fontWeight: 700,
+  },
+};
 
 export default Sidebar;

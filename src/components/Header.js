@@ -1,7 +1,12 @@
-function Header() {
+function Header({ onLogout }) {
   return (
-    <div style={{ background: "#f4f4f4", padding: "15px", borderBottom: "1px solid #ddd" }}>
-      <h3>HRMS Dashboard</h3>
+    <div className="header">
+      <h2>Cloud HRMS</h2>
+
+      {/* ✅ Logout Button */}
+      <button onClick={onLogout} className="logout-btn">
+        Logout
+      </button>
     </div>
   );
 }

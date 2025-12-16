@@ -1,9 +1,5 @@
-
-import { Navigate } from "react-router-dom";
-import { isLoggedIn } from "../utils/auth";
-
 function PrivateRoute({ children }) {
-  return isLoggedIn() ? children : <Navigate to="/login" />;
+  return children;   // 🚀 ALWAYS ALLOW ACCESS (temporary)
 }
 
 export default PrivateRoute;

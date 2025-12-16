@@ -1,8 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 
-// ------------------- DASHBOARD -------------------
-import Dashboard from "./pages/Dashboard";
+// ------------------- AUTH -------------------
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import VerifyOTP from "./pages/Auth/VerifyOTP";
+import ResetPassword from "./pages/Auth/ResetPassword";
+
+// ------------------- DASHBOARDS -------------------
+import AdminDashboard from "./pages/AdminDashboard";       // ✅ HR ADMIN
+import EmployeeDashboard from "./pages/EmployeeDashboard"; // ✅ EMPLOYEE
 
 // ------------------- EMPLOYEES -------------------
 import EmployeeList from "./pages/Employees/EmployeeList";
@@ -17,24 +25,16 @@ import AddPayroll from "./pages/Payroll/AddPayroll";
 // ------------------- ATTENDANCE -------------------
 import AttendanceActions from "./pages/Attendance/AttendanceActions";
 import AttendanceList from "./pages/Attendance/AttendanceList";
+import HRWorkingHours from "./pages/Attendance/HRWorkingHours";
 
 // ------------------- LEAVE -------------------
 import LeaveList from "./pages/Leave/LeaveList";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
 import LeaveApproval from "./pages/Leave/LeaveApproval";
 
-// ------------------- AUTH -------------------
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
-import ForgotPassword from "./pages/Auth/ForgotPassword";
-import VerifyOTP from "./pages/Auth/VerifyOTP";
-import ResetPassword from "./pages/Auth/ResetPassword";
-
-
 function AppLayout() {
   const location = useLocation();
 
-  // AUTH PAGES where sidebar must be hidden
   const hideSidebarRoutes = [
     "/login",
     "/register",
@@ -49,44 +49,50 @@ function AppLayout() {
     <>
       {!shouldHideSidebar && <Sidebar />}
 
-      <div style={{ marginLeft: shouldHideSidebar ? "0px" : "220px", padding: "20px" }}>
+      <div
+        style={{
+          marginLeft: shouldHideSidebar ? "0px" : "220px",
+          padding: "20px",
+        }}
+      >
         <Routes>
 
           {/* AUTH ROUTES */}
+          <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Dashboard */}
-          <Route path="/" element={<Dashboard />} />
+          {/* DASHBOARDS */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />       {/* HR Admin Dashboard */}
+          <Route path="/employee-dashboard" element={<EmployeeDashboard />} /> {/* Employee Dashboard */}
 
-          {/* Employees */}
+          {/* EMPLOYEES */}
           <Route path="/employees" element={<EmployeeList />} />
           <Route path="/employees/add" element={<AddEmployee />} />
           <Route path="/employees/edit/:id" element={<EditEmployee />} />
           <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
 
-          {/* Payroll */}
+          {/* PAYROLL */}
           <Route path="/payroll" element={<PayrollList />} />
           <Route path="/payroll/add" element={<AddPayroll />} />
 
-          {/* Attendance */}
-          <Route path="/attendance/actions" element={<AttendanceActions />} />
+          {/* ATTENDANCE */}
           <Route path="/attendance" element={<AttendanceList />} />
+          <Route path="/attendance/actions" element={<AttendanceActions />} />
+          <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
 
-          {/* Leaves */}
+          {/* LEAVE */}
           <Route path="/leave" element={<LeaveList />} />
           <Route path="/leave/apply" element={<ApplyLeave />} />
           <Route path="/leave/approve" element={<LeaveApproval />} />
-
         </Routes>
       </div>
     </>
   );
 }
-
 
 function App() {
   return (

@@ -1,281 +1,176 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import api from "../../api/api";
 
 function AttendanceActions() {
-  const [employees, setEmployees] = useState([]);
-  const [employeeId, setEmployeeId] = useState("");
-  const [message, setMessage] = useState("");
-  const [lastRecord, setLastRecord] = useState(null);
+  const [status, setStatus] = useState("Loading...");
+  const [checkInTime, setCheckInTime] = useState(null);
+  const [checkOutTime, setCheckOutTime] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const employeeId = localStorage.getItem("employee_id");
+
   useEffect(() => {
-    loadEmployees();
+    loadTodayStatus();
   }, []);
 
-  const loadEmployees = async () => {
+  /* -------------------- LOAD TODAY'S ATTENDANCE -------------------- */
+  const loadTodayStatus = async () => {
     try {
-      const res = await api.get("employees/");
-      setEmployees(res.data);
-    } catch (err) {
-      console.error("Error loading employees", err);
-    }
-  };
+      const res = await api.get("attendance/records/");
 
-  const handleCheck = async (type) => {
-    if (!employeeId) {
-      setMessage("Please select an employee first.");
-      setLastRecord(null);
-      return;
-    }
+      const today = new Date().toISOString().split("T")[0];
 
-    setLoading(true);
-    setMessage("");
-
-    try {
-      const url =
-        type === "in"
-          ? "attendance/check_in/"
-          : "attendance/check_out/";
-
-      const res = await api.post(url, { employee_id: employeeId });
-      setMessage(res.data.message || "Action success.");
-
-      const listRes = await api.get(
-        `attendance/?employee=${employeeId}&ordering=-id`
+      const record = res.data.find(
+        (r) =>
+          r.employee_id === Number(employeeId) &&
+          r.check_in?.startsWith(today)
       );
-      setLastRecord(listRes.data[0] || null);
 
+      if (!record) {
+        setStatus("Not Checked In");
+        return;
+      }
+
+      setCheckInTime(record.check_in);
+      setCheckOutTime(record.check_out);
+
+      setStatus(record.check_out ? "Checked Out" : "Checked In");
     } catch (err) {
-      console.error(err);
-      setMessage("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Load today status error:", err);
     }
   };
 
-  return (
-    <div style={pageWrapper}>
-      <div style={pageHeader}>
-        <div>
-          <h2 style={pageTitle}>⏱ Employee Check-in / Check-out</h2>
-          <p style={pageSubtitle}>
-            Mark real-time attendance for employees with a single click.
-          </p>
-        </div>
+  /* -------------------------- CHECK IN --------------------------- */
+  const handleCheckIn = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post("/api/attendance/check-in/", {
+        employee_id: employeeId,
+      });
 
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Link to="/" style={secondaryButton}>
-            ⬅ Back to Dashboard
-          </Link>
-          <Link to="/attendance" style={primaryOutlineButton}>
-            📋 View Attendance List
-          </Link>
-        </div>
-      </div>
+      setStatus("Checked In");
+      setCheckInTime(res.data.data.check_in);
+    } catch (err) {
+      console.error("Check-in error:", err);
+    }
+    setLoading(false);
+  };
+
+  /* -------------------------- CHECK OUT --------------------------- */
+  const handleCheckOut = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post("/api/attendance/check-out/", {
+        employee_id: employeeId,
+      });
+
+      setStatus("Checked Out");
+      setCheckOutTime(res.data.data.check_out);
+    } catch (err) {
+      console.error("Check-out error:", err);
+    }
+    setLoading(false);
+  };
+
+  /* ------------------------------ UI ------------------------------ */
+  return (
+    <div style={page}>
+      <h2 style={title}>⏱ Attendance — Check-in / Check-out</h2>
 
       <div style={card}>
-        <div style={formRow}>
-          <div style={{ flex: 2 }}>
-            <label style={label}>Select Employee</label>
-            <select
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              style={select}
-            >
-              <option value="">-- Choose Employee --</option>
-              {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>
-                  {emp.emp_code} - {emp.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <p style={label}>Today's Status</p>
+        <h3 style={value}>{status}</h3>
 
-          <div style={{ flex: 1, display: "flex", gap: "8px", marginTop: "24px" }}>
-            <button
-              type="button"
-              style={primaryButton}
-              onClick={() => handleCheck("in")}
-              disabled={loading}
-            >
-              ✅ Check-in
-            </button>
-
-            <button
-              type="button"
-              style={dangerButton}
-              onClick={() => handleCheck("out")}
-              disabled={loading}
-            >
-              🔚 Check-out
-            </button>
-          </div>
-        </div>
-
-        {message && <div style={infoBox}>{message}</div>}
-
-        {lastRecord && (
-          <div style={lastRecordBox}>
-            <h4 style={smallTitle}>Last Attendance Record</h4>
-
-            <p style={statLine}>
-              <strong>Date:</strong> {lastRecord.date}
-            </p>
-
-            <p style={statLine}>
-              <strong>Check-in:</strong>{" "}
-              {lastRecord.check_in
-                ? new Date(lastRecord.check_in).toLocaleString()
-                : "-"}
-            </p>
-
-            <p style={statLine}>
-              <strong>Check-out:</strong>{" "}
-              {lastRecord.check_out
-                ? new Date(lastRecord.check_out).toLocaleString()
-                : "-"}
-            </p>
-          </div>
+        {checkInTime && (
+          <p style={info}>✔ Checked in at: {new Date(checkInTime).toLocaleTimeString()}</p>
         )}
+
+        {checkOutTime && (
+          <p style={info}>✔ Checked out at: {new Date(checkOutTime).toLocaleTimeString()}</p>
+        )}
+
+        <div style={btnRow}>
+          <button
+            style={{
+              ...btn,
+              background: status === "Not Checked In" ? "#22c55e" : "#9ca3af",
+            }}
+            disabled={status !== "Not Checked In" || loading}
+            onClick={handleCheckIn}
+          >
+            {loading ? "Processing..." : "Check In"}
+          </button>
+
+          <button
+            style={{
+              ...btn,
+              background: status === "Checked In" ? "#ef4444" : "#9ca3af",
+            }}
+            disabled={status !== "Checked In" || loading}
+            onClick={handleCheckOut}
+          >
+            {loading ? "Processing..." : "Check Out"}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* 🎨 STYLING – TEAL HRMS THEME */
+/* ------------------------------ STYLES ------------------------------ */
 
-const pageWrapper = {
-  padding: "90px 24px 24px",
+const page = {
   minHeight: "100vh",
-  background: "linear-gradient(135deg, #F3FAFB 0%, #D1F0F2 50%, #F9FEFF 100%)",
+  padding: 24,
+  background: "#e0f2fe",
 };
 
-const pageHeader = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "18px",
-};
-
-const pageTitle = {
-  margin: 0,
-  color: "#003B3B",
-  fontSize: "24px",
+const title = {
+  color: "#0369a1",
+  marginBottom: 20,
   fontWeight: 700,
 };
 
-const pageSubtitle = {
-  margin: 0,
-  color: "#4b5563",
-  fontSize: "13px",
-};
-
 const card = {
-  background: "#ffffff",
-  borderRadius: "14px",
-  padding: "20px 22px",
-  boxShadow: "0 12px 30px rgba(15, 23, 42, 0.12)",
-  border: "1px solid rgba(0, 128, 128, 0.08)",
-};
-
-const formRow = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: "16px",
+  background: "white",
+  padding: 24,
+  borderRadius: 14,
+  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+  maxWidth: 500,
 };
 
 const label = {
-  fontSize: "13px",
-  fontWeight: 600,
-  color: "#003B3B",
-  marginBottom: "4px",
+  fontSize: 14,
+  color: "#6b7280",
 };
 
-const select = {
-  width: "100%",
-  borderRadius: "8px",
-  border: "1px solid #cbd5e1",
-  padding: "8px 10px",
-  fontSize: "14px",
-  outline: "none",
+const value = {
+  fontSize: 28,
+  fontWeight: 700,
+  color: "#0ea5e9",
 };
 
-const primaryButton = {
+const info = {
+  marginTop: 8,
+  fontSize: 14,
+  color: "#475569",
+};
+
+const btnRow = {
+  display: "flex",
+  gap: 10,
+  marginTop: 20,
+};
+
+const btn = {
   flex: 1,
-  background: "#008080",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: "8px",
-  padding: "9px 10px",
-  fontSize: "14px",
+  padding: "12px 14px",
+  borderRadius: 10,
+  color: "white",
   fontWeight: 600,
+  border: "none",
+  fontSize: 16,
   cursor: "pointer",
-};
-
-const dangerButton = {
-  flex: 1,
-  background: "#EF4444",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: "8px",
-  padding: "9px 10px",
-  fontSize: "14px",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const secondaryButton = {
-  background: "#ffffff",
-  color: "#008080",
-  borderRadius: "8px",
-  padding: "8px 14px",
-  border: "1px solid #008080",
-  textDecoration: "none",
-  fontSize: "13px",
-  fontWeight: 600,
-};
-
-const primaryOutlineButton = {
-  background: "#008080",
-  color: "#ffffff",
-  borderRadius: "8px",
-  padding: "8px 14px",
-  border: "none",
-  textDecoration: "none",
-  fontSize: "13px",
-  fontWeight: 600,
-};
-
-const infoBox = {
-  marginTop: "16px",
-  background: "#E0F2FE",
-  borderRadius: "8px",
-  padding: "8px 10px",
-  fontSize: "13px",
-  color: "#0F172A",
-  border: "1px solid #93C5FD",
-};
-
-const lastRecordBox = {
-  marginTop: "18px",
-  padding: "10px 12px",
-  borderRadius: "10px",
-  background: "#F9FAFB",
-  border: "1px dashed #D1D5DB",
-};
-
-const smallTitle = {
-  fontSize: "14px",
-  fontWeight: 600,
-  color: "#111827",
-  marginBottom: "6px",
-};
-
-const statLine = {
-  fontSize: "13px",
-  color: "#4b5563",
-  marginBottom: "4px",
 };
 
 export default AttendanceActions;

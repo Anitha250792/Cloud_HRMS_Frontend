@@ -18,11 +18,12 @@ function AddPayroll() {
     }
 
     try {
-      const res = await api.post("payroll/generate_salary/", {
-        employee_id: Number(employee),
-        month: Number(month),
-        year: Number(year),
-      });
+      const res = await api.post("payroll/generate-all/", {
+  employee_id: Number(employee),
+  month: Number(month),
+  year: Number(year),
+});
+
 
       setMsg("🎉 Payroll generated successfully!");
       console.log(res.data);

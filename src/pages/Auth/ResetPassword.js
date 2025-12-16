@@ -1,59 +1,89 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
-import { authStyles as styles } from "./authStyles";
-
 
 function ResetPassword() {
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [msg, setMsg] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setEmail(params.get("email"));
-  }, []);
+  const [form, setForm] = useState({
+    old_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
 
-  const resetPass = async () => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (form.new_password !== form.confirm_password) {
+      return setError("New password and confirm password do not match ❌");
+    }
+    if (form.new_password.length < 6) {
+      return setError("Password must be at least 6 characters ❌");
+    }
+
     try {
-      await api.post("auth/reset-password/", { email, password });
-      setMsg("Password reset successful ✔️");
+      const res = await api.post("auth/reset-password/", {
+        old_password: form.old_password,
+        new_password: form.new_password,
+      });
 
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1000);
-
+      if (res.status === 200) {
+        setSuccess("Password updated successfully ✔ Redirecting…");
+        setTimeout(() => navigate("/login"), 1500);
+      }
     } catch (err) {
-      setMsg("❌ Failed to reset password");
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to reset password ❌");
+      }
     }
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
+    <div style={wrapper}>
+      <div style={card}>
+        <h2 style={{ marginBottom: 15 }}>Reset Password 🔒</h2>
 
-        <h2 style={styles.title}>Set New Password</h2>
-        <p style={styles.subtitle}>Reset password for: {email}</p>
+        {error && <div style={errorBox}>{error}</div>}
+        {success && <div style={successBox}>{success}</div>}
 
-        {msg && <div style={styles.alert}>{msg}</div>}
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>New Password</label>
+        <form style={formBox} onSubmit={handleReset}>
           <input
-            style={styles.input}
             type="password"
-            placeholder="Enter new password"
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Old Password"
+            required
+            style={input}
+            onChange={(e) => setForm({ ...form, old_password: e.target.value })}
           />
-        </div>
 
-        <button style={styles.button} onClick={resetPass}>
-          Reset Password
-        </button>
+          <input
+            type="password"
+            placeholder="New Password"
+            required
+            style={input}
+            onChange={(e) => setForm({ ...form, new_password: e.target.value })}
+          />
 
+          <input
+            type="password"
+            placeholder="Confirm New Password"
+            required
+            style={input}
+            onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
+          />
+
+          <button style={btn}>Update Password</button>
+        </form>
       </div>
     </div>
   );
 }
 
-
+/* styles omitted for brevity — reuse the same style block I sent earlier */
 export default ResetPassword;

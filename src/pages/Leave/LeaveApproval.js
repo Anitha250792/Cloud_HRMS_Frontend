@@ -2,67 +2,69 @@ import { useEffect, useState } from "react";
 import api from "../../api/api";
 
 function LeaveApproval() {
-  const [leave, setLeave] = useState([]);
+  const [leaves, setLeaves] = useState([]);
 
-  useEffect(() => {
-    loadPendingLeave();
-  }, []);
-
-  const loadPendingLeave = async () => {
-    const res = await api.get("/api/leaves/");
-    setLeave(res.data.filter((l) => l.status === "PENDING"));
+  const loadLeaves = async () => {
+    const res = await api.get("leave/");
+    setLeaves(res.data.filter(l => l.status === "PENDING"));
   };
 
-  const updateStatus = async (id, status) => {
-    await api.post(`/api/leaves/${id}/${status}/`);
-    loadPendingLeave();
+  useEffect(() => {
+    loadLeaves();
+  }, []);
+
+  const updateStatus = async (id, action) => {
+    await api.post(`leave/${id}/${action}/`);
+    loadLeaves();
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.heading}>📝 Pending Leave Requests</h2>
+        <h2 style={styles.heading}>📝 Pending Leave Approvals</h2>
 
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>ID</th>
-              <th style={styles.th}>Employee</th>
-              <th style={styles.th}>Type</th>
-              <th style={styles.th}>Dates</th>
-              <th style={styles.th}>Reason</th>
-              <th style={styles.th}>Actions</th>
+              <th>Employee</th>
+              <th>Type</th>
+              <th>Dates</th>
+              <th>Reason</th>
+              <th>Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {leave.map((l) => (
-              <tr key={l.id} style={styles.tr}>
-                <td style={styles.td}>{l.id}</td>
-                <td style={styles.td}>{l.employee_name}</td>
-                <td style={styles.td}>{l.leave_type}</td>
-                <td style={styles.td}>
-                  {l.start_date} → {l.end_date}
-                </td>
-                <td style={styles.td}>{l.reason}</td>
-
-                <td style={styles.td}>
+            {leaves.map(l => (
+              <tr key={l.id}>
+                <td>{l.employee_name}</td>
+                <td>{l.leave_type}</td>
+                <td>{l.start_date} → {l.end_date}</td>
+                <td>{l.reason}</td>
+                <td>
                   <button
-                    style={{ ...styles.btn, ...styles.approve }}
+                    style={{ ...styles.btn, background: "#16a34a" }}
                     onClick={() => updateStatus(l.id, "approve")}
                   >
-                    ✔ Approve
+                    Approve
                   </button>
-
                   <button
-                    style={{ ...styles.btn, ...styles.reject }}
+                    style={{ ...styles.btn, background: "#dc2626" }}
                     onClick={() => updateStatus(l.id, "reject")}
                   >
-                    ✖ Reject
+                    Reject
                   </button>
                 </td>
               </tr>
             ))}
+
+            {leaves.length === 0 && (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", padding: 20 }}>
+                  No pending leaves 🎉
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -70,60 +72,41 @@ function LeaveApproval() {
   );
 }
 
-/* ---- Styles ---- */
+export default LeaveApproval;
+
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f4f7fc",
-    padding: "40px",
+    padding: 40,
+    background: "#f3f4f6",
     display: "flex",
     justifyContent: "center",
   },
   card: {
     width: "100%",
-    maxWidth: "1000px",
+    maxWidth: 1100,
     background: "#fff",
-    padding: "30px",
-    borderRadius: "15px",
+    padding: 30,
+    borderRadius: 16,
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
   },
   heading: {
-    textAlign: "center",
     fontSize: 26,
     fontWeight: 700,
     marginBottom: 20,
+    textAlign: "center",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
   },
-  th: {
-    background: "#1d4ed8",
-    color: "white",
-    padding: "12px",
-    textAlign: "left",
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #e5e7eb",
-  },
-  tr: { transition: "0.2s" },
   btn: {
     padding: "8px 14px",
-    borderRadius: "8px",
+    color: "#fff",
     border: "none",
+    borderRadius: 8,
+    marginRight: 8,
     cursor: "pointer",
     fontWeight: 600,
-    marginRight: 8,
-  },
-  approve: {
-    background: "#10b981",
-    color: "white",
-  },
-  reject: {
-    background: "#ef4444",
-    color: "white",
   },
 };
-
-export default LeaveApproval;
