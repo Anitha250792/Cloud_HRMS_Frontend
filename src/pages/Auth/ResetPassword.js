@@ -1,89 +1,135 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 
 function ResetPassword() {
-  const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    old_password: "",
-    new_password: "",
-    confirm_password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleReset = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (form.new_password !== form.confirm_password) {
-      return setError("New password and confirm password do not match ❌");
-    }
-    if (form.new_password.length < 6) {
-      return setError("Password must be at least 6 characters ❌");
-    }
-
     try {
-      const res = await api.post("auth/reset-password/", {
-        old_password: form.old_password,
-        new_password: form.new_password,
+      await api.post("auth/reset-password/", {
+        email,
+        otp,
+        password,
       });
 
-      if (res.status === 200) {
-        setSuccess("Password updated successfully ✔ Redirecting…");
-        setTimeout(() => navigate("/login"), 1500);
-      }
+      setSuccess("✅ Password reset successfully. You can login now.");
+      setEmail("");
+      setOtp("");
+      setPassword("");
     } catch (err) {
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Failed to reset password ❌");
-      }
+      setError(err.response?.data?.error || "Password reset failed");
     }
   };
 
   return (
     <div style={wrapper}>
       <div style={card}>
-        <h2 style={{ marginBottom: 15 }}>Reset Password 🔒</h2>
+        <h2>🔑 Reset Password</h2>
 
         {error && <div style={errorBox}>{error}</div>}
         {success && <div style={successBox}>{success}</div>}
 
-        <form style={formBox} onSubmit={handleReset}>
+        <form onSubmit={handleSubmit} style={formBox}>
           <input
-            type="password"
-            placeholder="Old Password"
-            required
             style={input}
-            onChange={(e) => setForm({ ...form, old_password: e.target.value })}
+            type="email"
+            placeholder="Registered Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
+            style={input}
+            type="text"
+            placeholder="OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+          />
+
+          <input
+            style={input}
             type="password"
             placeholder="New Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
-            style={input}
-            onChange={(e) => setForm({ ...form, new_password: e.target.value })}
           />
 
-          <input
-            type="password"
-            placeholder="Confirm New Password"
-            required
-            style={input}
-            onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
-          />
-
-          <button style={btn}>Update Password</button>
+          <button style={btn}>Reset Password</button>
         </form>
       </div>
     </div>
   );
 }
 
-/* styles omitted for brevity — reuse the same style block I sent earlier */
 export default ResetPassword;
+
+/* ===================== STYLES ===================== */
+
+const wrapper = {
+  minHeight: "100vh",
+  background: "linear-gradient(135deg,#eef2ff,#f0f9ff)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const card = {
+  width: 380,
+  background: "#fff",
+  padding: 30,
+  borderRadius: 16,
+  boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+};
+
+const formBox = {
+  marginTop: 20,
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+};
+
+const input = {
+  padding: 12,
+  borderRadius: 8,
+  border: "1px solid #d1d5db",
+  fontSize: 14,
+};
+
+const btn = {
+  marginTop: 10,
+  padding: 12,
+  borderRadius: 10,
+  background: "#2563EB",
+  color: "#fff",
+  border: "none",
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const errorBox = {
+  background: "#fee2e2",
+  color: "#991b1b",
+  padding: 10,
+  borderRadius: 8,
+  marginTop: 10,
+};
+
+const successBox = {
+  background: "#dcfce7",
+  color: "#166534",
+  padding: 10,
+  borderRadius: 8,
+  marginTop: 10,
+};
