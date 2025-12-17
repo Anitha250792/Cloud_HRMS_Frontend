@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api/api";
 
 function EmployeeDashboard() {
@@ -7,55 +7,55 @@ function EmployeeDashboard() {
   const [payroll, setPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const hasLoaded = useRef(false);
 
-  useEffect(() => {
-    loadEmployeeData();
-  }, []);
+
+ useEffect(() => {
+  if (hasLoaded.current) return;
+  hasLoaded.current = true;
+
+  loadEmployeeData();
+}, []);
 
   const loadEmployeeData = async () => {
-    try {
-      /* ✅ TODAY ATTENDANCE */
-      const attendanceRes = await api.get("attendance/my-today/");
-      setAttendance(attendanceRes.data);
+  try {
+    const attendanceRes = await api.get("/api/attendance/my-today/");
+    setAttendance(attendanceRes.data);
 
-      /* ✅ MY LEAVES */
-      const leaveRes = await api.get("leave/my/");
-      setLeaveCount(leaveRes.data.length);
+    const leaveRes = await api.get("/api/leave/my/");
+    setLeaveCount(leaveRes.data.length);
 
-      /* ✅ MY PAYROLL (LATEST) */
-      const payrollRes = await api.get("payroll/my/");
-      if (payrollRes.data.length > 0) {
-        setPayroll(payrollRes.data[0]);
-      }
-
-    } catch (err) {
-      console.error("Employee dashboard error:", err);
-    } finally {
-      setLoading(false);
+    const payrollRes = await api.get("/api/payroll/my/");
+    if (payrollRes.data.length > 0) {
+      setPayroll(payrollRes.data[0]);
     }
-  };
+  } catch (err) {
+    console.error("Employee dashboard error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  /* ---------------- CHECK IN ---------------- */
-  const handleCheckIn = async () => {
-    try {
-      const res = await api.post("attendance/check-in/");
-      setMsg(res.data.message);
-      loadEmployeeData();
-    } catch (err) {
-      setMsg(err.response?.data?.error || "Check-in failed");
-    }
-  };
+const handleCheckIn = async () => {
+  try {
+    const res = await api.post("/api/attendance/check-in/");
+    setMsg(res.data.message);
+    loadEmployeeData();
+  } catch (err) {
+    setMsg(err.response?.data?.error || "Check-in failed");
+  }
+};
 
-  /* ---------------- CHECK OUT ---------------- */
-  const handleCheckOut = async () => {
-    try {
-      const res = await api.post("attendance/check-out/");
-      setMsg(res.data.message);
-      loadEmployeeData();
-    } catch (err) {
-      setMsg(err.response?.data?.error || "Check-out failed");
-    }
-  };
+const handleCheckOut = async () => {
+  try {
+    const res = await api.post("/api/attendance/check-out/");
+    setMsg(res.data.message);
+    loadEmployeeData();
+  } catch (err) {
+    setMsg(err.response?.data?.error || "Check-out failed");
+  }
+};
+
 
   if (loading) return <div style={loadingBox}>Loading dashboard...</div>;
 
