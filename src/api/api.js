@@ -1,11 +1,10 @@
-// frontend/src/api/api.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
+  baseURL: "https://cloud-hrms-1.onrender.com",
 });
 
-// ---------- Attach access token on every request ----------
+/* ---------- Attach access token ---------- */
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
   if (token) {
@@ -14,17 +13,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ---------- Auto refresh JWT on 401 ----------
+/* ---------- Auto refresh JWT ---------- */
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+    error ? prom.reject(error) : prom.resolve(token);
   });
   failedQueue = [];
 };
@@ -34,51 +29,43 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const refreshToken = localStorage.getItem("refresh");
-
-      if (!refreshToken) {
+      const refresh = localStorage.getItem("refresh");
+      if (!refresh) {
         localStorage.clear();
         window.location.href = "/login";
         return Promise.reject(error);
       }
 
       if (isRefreshing) {
-        // queue this request while refresh is happening
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = "Bearer " + token;
-            return api(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        }).then((token) => {
+          originalRequest.headers.Authorization = "Bearer " + token;
+          return api(originalRequest);
+        });
       }
 
       isRefreshing = true;
 
       try {
         const res = await axios.post(
-          "http://127.0.0.1:8000/api/auth/token/refresh/",
-          { refresh: refreshToken }
+          "https://cloud-hrms-1.onrender.com/api/token/refresh/",
+          { refresh }
         );
 
-        const newAccess = res.data.access;
-        localStorage.setItem("access", newAccess);
+        localStorage.setItem("access", res.data.access);
+        processQueue(null, res.data.access);
         isRefreshing = false;
-        processQueue(null, newAccess);
 
-        originalRequest.headers.Authorization = "Bearer " + newAccess;
+        originalRequest.headers.Authorization =
+          "Bearer " + res.data.access;
         return api(originalRequest);
       } catch (err) {
+        processQueue(err);
         isRefreshing = false;
-        processQueue(err, null);
         localStorage.clear();
         window.location.href = "/login";
         return Promise.reject(err);
