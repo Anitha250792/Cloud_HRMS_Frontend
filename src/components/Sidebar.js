@@ -295,7 +295,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: 12,
-    color: "#DC2626",
+    color: "#fff",
     fontWeight: 700,
   },
 };

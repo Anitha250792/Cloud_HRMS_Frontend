@@ -5,9 +5,12 @@ import api from "../../api/api";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   /* ---------------- LOGIN ---------------- */
   const handleLogin = async (e) => {
@@ -29,7 +32,7 @@ export default function Login() {
       setError(
         err.response?.data?.error ||
         err.response?.data?.detail ||
-        "Invalid email or password"
+        "Invalid email or password ❌"
       );
     }
   };
@@ -45,52 +48,47 @@ export default function Login() {
 
       navigate("/dashboard");
     } catch {
-      setError("Google login failed");
+      setError("Google login failed ❌");
     }
   };
 
   return (
     <div style={page}>
       <div style={card}>
-        {/* HEADER */}
-        <div style={logo}>HRMS</div>
-        <h2 style={title}>Welcome Back 👋</h2>
-        <p style={sub}>Login to continue to your dashboard</p>
+        <div style={icon}>🔒</div>
+
+        <h2 style={title}>Welcome Back</h2>
+        <p style={sub}>Login to access HRMS</p>
 
         {error && <div style={errorBox}>{error}</div>}
 
-        {/* FORM */}
         <form onSubmit={handleLogin} style={form}>
-          {/* EMAIL */}
-          <div style={field}>
-            <input
-              type="email"
-              required
-              style={input}
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-            <label style={label}>Email address</label>
-          </div>
+          <input
+            type="email"
+            placeholder="Email address"
+            required
+            style={input}
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+          />
 
-          {/* PASSWORD */}
-          <div style={field}>
+          <div style={{ position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
+              placeholder="Password"
               required
-              style={{ ...input, paddingRight: 44 }}
+              style={{ ...input, paddingRight: 40 }}
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
             />
-            <label style={label}>Password</label>
-
             <span
               style={eye}
               onClick={() => setShowPassword(!showPassword)}
+              title="Show / Hide password"
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
@@ -99,26 +97,18 @@ export default function Login() {
           <button style={btn}>Sign In</button>
         </form>
 
-        {/* DIVIDER */}
-        <div style={divider}>
-          <span style={line}></span>
-          <span style={or}>OR</span>
-          <span style={line}></span>
-        </div>
-
         {/* GOOGLE LOGIN */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={googleWrap}>
           <GoogleLogin
             onSuccess={(res) => handleGoogleLogin(res.credential)}
-            onError={() => setError("Google Login Failed")}
-            width="260"
+            onError={() => setError("Google login failed ❌")}
           />
         </div>
 
         <p style={bottom}>
           New here?{" "}
           <Link to="/register" style={link}>
-            Create an account
+            Create account
           </Link>
         </p>
       </div>
@@ -126,110 +116,88 @@ export default function Login() {
   );
 }
 
-/* ================= STYLES ================= */
+/* ---------- SAME STYLES AS REGISTER ---------- */
 
 const page = {
   minHeight: "100vh",
-  background: "linear-gradient(135deg,#0f172a,#1e293b,#020617)",
+  background: "linear-gradient(180deg,#eef2ff,#f8fafc)",
   display: "flex",
-  justifyContent: "center",
   alignItems: "center",
-  padding: 20,
+  justifyContent: "center",
 };
 
 const card = {
   width: 380,
-  padding: "36px 32px",
-  borderRadius: 20,
-  background: "rgba(255,255,255,0.08)",
-  backdropFilter: "blur(18px)",
-  boxShadow: "0 20px 60px rgba(0,0,0,0.55)",
-  color: "#fff",
+  background: "#fff",
+  borderRadius: 18,
+  padding: "35px 30px",
+  boxShadow: "0 15px 35px rgba(0,0,0,0.12)",
   textAlign: "center",
 };
 
-const logo = {
-  width: 64,
-  height: 64,
+const icon = {
+  width: 55,
+  height: 55,
   borderRadius: "50%",
-  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+  background: "#2563eb",
+  color: "#fff",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "0 auto 16px",
-  fontWeight: 800,
-  fontSize: 18,
+  margin: "0 auto 15px",
+  fontSize: 24,
 };
 
-const title = { fontSize: 26, fontWeight: 800 };
-const sub = { fontSize: 14, opacity: 0.8, marginBottom: 24 };
+const title = { fontSize: 22, fontWeight: 700 };
+const sub = { fontSize: 14, color: "#6b7280", marginBottom: 20 };
 
-const form = { display: "flex", flexDirection: "column", gap: 18 };
-
-const field = { position: "relative" };
+const form = { display: "flex", flexDirection: "column", gap: 12 };
 
 const input = {
-  width: "100%",
-  padding: "16px 14px 10px",
-  background: "rgba(255,255,255,0.12)",
-  border: "1px solid rgba(255,255,255,0.25)",
-  borderRadius: 12,
-  color: "#fff",
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #e5e7eb",
+  fontSize: 14,
   outline: "none",
-  fontSize: 15,
-};
-
-const label = {
-  position: "absolute",
-  top: 8,
-  left: 14,
-  fontSize: 12,
-  color: "#c7d2fe",
 };
 
 const eye = {
   position: "absolute",
   right: 12,
-  top: 18,
+  top: 12,
   cursor: "pointer",
-  fontSize: 18,
+  fontSize: 16,
 };
 
 const btn = {
-  marginTop: 10,
-  padding: "14px",
-  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
-  borderRadius: 14,
-  border: "none",
+  marginTop: 8,
+  padding: 12,
+  background: "#2563eb",
   color: "#fff",
-  fontSize: 16,
-  fontWeight: 700,
+  border: "none",
+  borderRadius: 10,
+  fontWeight: 600,
   cursor: "pointer",
 };
 
-const divider = {
+const googleWrap = {
+  marginTop: 15,
   display: "flex",
-  alignItems: "center",
-  gap: 10,
-  margin: "22px 0",
+  justifyContent: "center",
 };
 
-const line = {
-  flex: 1,
-  height: 1,
-  background: "rgba(255,255,255,0.3)",
+const bottom = { marginTop: 15, fontSize: 14 };
+
+const link = {
+  color: "#2563eb",
+  textDecoration: "none",
+  fontWeight: 500,
 };
-
-const or = { fontSize: 13, opacity: 0.7 };
-
-const bottom = { marginTop: 18, fontSize: 14, opacity: 0.9 };
-const link = { color: "#a5b4fc", fontWeight: 600 };
 
 const errorBox = {
-  background: "rgba(239,68,68,0.2)",
-  border: "1px solid rgba(239,68,68,0.5)",
-  color: "#fecaca",
-  padding: 12,
-  borderRadius: 12,
-  marginBottom: 18,
+  background: "#fee2e2",
+  color: "#b91c1c",
+  padding: 10,
+  borderRadius: 8,
+  marginBottom: 12,
 };
