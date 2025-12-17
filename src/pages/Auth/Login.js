@@ -9,72 +9,89 @@ export default function Login() {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
+  /* ---------------- LOGIN ---------------- */
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  try {
-    const res = await api.post("/api/auth/login/", {
-      email: formData.email,
-      password: formData.password,
-    });
+    try {
+      const res = await api.post("/auth/login/", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-    localStorage.setItem("access", res.data.access);
-    localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("role", res.data.role);
 
-    navigate("/dashboard");
-  } catch (err) {
-    setError("Invalid email or password ❌");
-  }
-};
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Invalid email or password"
+      );
+    }
+  };
 
-const handleGoogleLogin = async (credential) => {
-  try {
-    const res = await api.post("/api/auth/google/", { credential });
+  /* ---------------- GOOGLE LOGIN ---------------- */
+  const handleGoogleLogin = async (credential) => {
+    try {
+      const res = await api.post("/auth/google/", { credential });
 
-    localStorage.setItem("access", res.data.access);
-    localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("role", res.data.role);
 
-    navigate("/dashboard");
-  } catch {
-    setError("Google login failed ❌");
-  }
-};
-
+      navigate("/dashboard");
+    } catch {
+      setError("Google login failed");
+    }
+  };
 
   return (
     <div style={page}>
       <div style={card}>
-        <div style={icon}>🔒</div>
-        <h2 style={title}>Admin Login</h2>
-        <p style={sub}>Access Admin Dashboard</p>
+        {/* HEADER */}
+        <div style={logo}>HRMS</div>
+        <h2 style={title}>Welcome Back 👋</h2>
+        <p style={sub}>Login to continue to your dashboard</p>
 
         {error && <div style={errorBox}>{error}</div>}
 
+        {/* FORM */}
         <form onSubmit={handleLogin} style={form}>
-          <input
-            type="email"
-            placeholder="Email address"
-            required
-            style={input}
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-          />
-
-          <div style={{ position: "relative" }}>
+          {/* EMAIL */}
+          <div style={field}>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              type="email"
               required
               style={input}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+            <label style={label}>Email address</label>
+          </div>
+
+          {/* PASSWORD */}
+          <div style={field}>
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              style={{ ...input, paddingRight: 44 }}
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
             />
-            <span style={eye} onClick={() => setShowPassword(!showPassword)}>
+            <label style={label}>Password</label>
+
+            <span
+              style={eye}
+              onClick={() => setShowPassword(!showPassword)}
+            >
               {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
@@ -82,87 +99,137 @@ const handleGoogleLogin = async (credential) => {
           <button style={btn}>Sign In</button>
         </form>
 
-        <div style={divider}>OR</div>
+        {/* DIVIDER */}
+        <div style={divider}>
+          <span style={line}></span>
+          <span style={or}>OR</span>
+          <span style={line}></span>
+        </div>
 
-        <GoogleLogin
-          onSuccess={(res) => handleGoogleLogin(res.credential)}
-          onError={() => setError("Google Login Failed")}
-        />
+        {/* GOOGLE LOGIN */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <GoogleLogin
+            onSuccess={(res) => handleGoogleLogin(res.credential)}
+            onError={() => setError("Google Login Failed")}
+            width="260"
+          />
+        </div>
 
         <p style={bottom}>
-          New user? <Link to="/register">Create account</Link>
+          New here?{" "}
+          <Link to="/register" style={link}>
+            Create an account
+          </Link>
         </p>
       </div>
     </div>
   );
 }
 
-/* ---------- styles ---------- */
+/* ================= STYLES ================= */
 
 const page = {
   minHeight: "100vh",
+  background: "linear-gradient(135deg,#0f172a,#1e293b,#020617)",
   display: "flex",
-  alignItems: "center",
   justifyContent: "center",
-  background: "#f1f5f9",
+  alignItems: "center",
+  padding: 20,
 };
 
 const card = {
-  width: 360,
-  background: "#fff",
-  padding: 30,
-  borderRadius: 16,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+  width: 380,
+  padding: "36px 32px",
+  borderRadius: 20,
+  background: "rgba(255,255,255,0.08)",
+  backdropFilter: "blur(18px)",
+  boxShadow: "0 20px 60px rgba(0,0,0,0.55)",
+  color: "#fff",
   textAlign: "center",
 };
 
-const icon = {
-  width: 55,
-  height: 55,
+const logo = {
+  width: 64,
+  height: 64,
   borderRadius: "50%",
-  background: "#2563eb",
-  color: "#fff",
+  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "0 auto 15px",
+  margin: "0 auto 16px",
+  fontWeight: 800,
+  fontSize: 18,
 };
 
-const title = { fontSize: 22, fontWeight: 700 };
-const sub = { fontSize: 14, color: "#6b7280", marginBottom: 20 };
+const title = { fontSize: 26, fontWeight: 800 };
+const sub = { fontSize: 14, opacity: 0.8, marginBottom: 24 };
 
-const form = { display: "flex", flexDirection: "column", gap: 12 };
+const form = { display: "flex", flexDirection: "column", gap: 18 };
+
+const field = { position: "relative" };
 
 const input = {
-  padding: 12,
-  borderRadius: 10,
-  border: "1px solid #e5e7eb",
+  width: "100%",
+  padding: "16px 14px 10px",
+  background: "rgba(255,255,255,0.12)",
+  border: "1px solid rgba(255,255,255,0.25)",
+  borderRadius: 12,
+  color: "#fff",
+  outline: "none",
+  fontSize: 15,
+};
+
+const label = {
+  position: "absolute",
+  top: 8,
+  left: 14,
+  fontSize: 12,
+  color: "#c7d2fe",
 };
 
 const eye = {
   position: "absolute",
   right: 12,
-  top: 12,
+  top: 18,
   cursor: "pointer",
+  fontSize: 18,
 };
 
 const btn = {
-  padding: 12,
-  background: "#2563eb",
-  color: "#fff",
+  marginTop: 10,
+  padding: "14px",
+  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+  borderRadius: 14,
   border: "none",
-  borderRadius: 10,
-  fontWeight: 600,
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: 700,
+  cursor: "pointer",
 };
 
-const divider = { margin: "15px 0", color: "#9ca3af" };
+const divider = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "22px 0",
+};
 
-const bottom = { marginTop: 15, fontSize: 14 };
+const line = {
+  flex: 1,
+  height: 1,
+  background: "rgba(255,255,255,0.3)",
+};
+
+const or = { fontSize: 13, opacity: 0.7 };
+
+const bottom = { marginTop: 18, fontSize: 14, opacity: 0.9 };
+const link = { color: "#a5b4fc", fontWeight: 600 };
 
 const errorBox = {
-  background: "#fee2e2",
-  color: "#b91c1c",
-  padding: 10,
-  borderRadius: 8,
-  marginBottom: 10,
+  background: "rgba(239,68,68,0.2)",
+  border: "1px solid rgba(239,68,68,0.5)",
+  color: "#fecaca",
+  padding: 12,
+  borderRadius: 12,
+  marginBottom: 18,
 };
