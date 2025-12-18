@@ -21,7 +21,8 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/login/jwt/", {
+      // ✅ CORRECT ENDPOINT
+      const res = await api.post("/api/auth/login/", {
         email: formData.email,
         password: formData.password,
       });
@@ -30,12 +31,17 @@ export default function Login() {
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("role", res.data.role);
 
-      navigate("/dashboard");
+      // ✅ ROLE BASED REDIRECT
+      if (res.data.role === "HR") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/employee-dashboard");
+      }
     } catch (err) {
       setError(
         err.response?.data?.error ||
-        err.response?.data?.detail ||
-        "Invalid email or password ❌"
+          err.response?.data?.detail ||
+          "Invalid email or password ❌"
       );
     } finally {
       setLoading(false);
@@ -51,7 +57,11 @@ export default function Login() {
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("role", res.data.role);
 
-      navigate("/dashboard");
+      navigate(
+        res.data.role === "HR"
+          ? "/admin-dashboard"
+          : "/employee-dashboard"
+      );
     } catch {
       setError("Google login failed ❌");
     }
@@ -69,24 +79,26 @@ export default function Login() {
 
         <form onSubmit={handleLogin} style={form}>
           {/* EMAIL */}
-          <input
-            type="email"
-            placeholder="Email address"
-            required
-            style={input}
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-          />
+          <div style={fieldWrapper}>
+            <input
+              type="email"
+              placeholder="Email address"
+              required
+              style={input}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+          </div>
 
-          {/* PASSWORD (FULL WIDTH FIXED) */}
-          <div style={passwordWrapper}>
+          {/* PASSWORD */}
+          <div style={fieldWrapper}>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               required
-              style={passwordInput}
+              style={input}
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -95,7 +107,6 @@ export default function Login() {
             <span
               style={eye}
               onClick={() => setShowPassword(!showPassword)}
-              title="Show / Hide password"
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
@@ -166,28 +177,20 @@ const form = {
   gap: 14,
 };
 
-const input = {
-  width: "100%",
-  padding: 12,
-  borderRadius: 10,
-  border: "1px solid #e5e7eb",
-  fontSize: 14,
-  outline: "none",
-};
-
-const passwordWrapper = {
+/* 🔥 KEY FIX */
+const fieldWrapper = {
   position: "relative",
   width: "100%",
 };
 
-const passwordInput = {
+const input = {
   width: "100%",
-  padding: 12,
-  paddingRight: 42,
+  padding: "12px 40px 12px 12px", // SAME for email & password
   borderRadius: 10,
   border: "1px solid #e5e7eb",
   fontSize: 14,
   outline: "none",
+  boxSizing: "border-box",
 };
 
 const eye = {
