@@ -7,6 +7,8 @@ export default function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,9 +18,10 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const res = await api.post("/auth/login/", {
+      const res = await api.post("/api/auth/login/jwt/", {
         email: formData.email,
         password: formData.password,
       });
@@ -34,13 +37,15 @@ export default function Login() {
         err.response?.data?.detail ||
         "Invalid email or password ❌"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   /* ---------------- GOOGLE LOGIN ---------------- */
   const handleGoogleLogin = async (credential) => {
     try {
-      const res = await api.post("/auth/google/", { credential });
+      const res = await api.post("/api/auth/google/", { credential });
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
@@ -63,6 +68,7 @@ export default function Login() {
         {error && <div style={errorBox}>{error}</div>}
 
         <form onSubmit={handleLogin} style={form}>
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email address"
@@ -74,12 +80,13 @@ export default function Login() {
             }
           />
 
-          <div style={{ position: "relative" }}>
+          {/* PASSWORD (FULL WIDTH FIXED) */}
+          <div style={passwordWrapper}>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               required
-              style={{ ...input, paddingRight: 40 }}
+              style={passwordInput}
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -94,7 +101,9 @@ export default function Login() {
             </span>
           </div>
 
-          <button style={btn}>Sign In</button>
+          <button style={btn} disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
         </form>
 
         {/* GOOGLE LOGIN */}
@@ -116,7 +125,7 @@ export default function Login() {
   );
 }
 
-/* ---------- SAME STYLES AS REGISTER ---------- */
+/* ---------------- STYLES ---------------- */
 
 const page = {
   minHeight: "100vh",
@@ -151,10 +160,30 @@ const icon = {
 const title = { fontSize: 22, fontWeight: 700 };
 const sub = { fontSize: 14, color: "#6b7280", marginBottom: 20 };
 
-const form = { display: "flex", flexDirection: "column", gap: 12 };
+const form = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 14,
+};
 
 const input = {
+  width: "100%",
   padding: 12,
+  borderRadius: 10,
+  border: "1px solid #e5e7eb",
+  fontSize: 14,
+  outline: "none",
+};
+
+const passwordWrapper = {
+  position: "relative",
+  width: "100%",
+};
+
+const passwordInput = {
+  width: "100%",
+  padding: 12,
+  paddingRight: 42,
   borderRadius: 10,
   border: "1px solid #e5e7eb",
   fontSize: 14,
@@ -164,13 +193,14 @@ const input = {
 const eye = {
   position: "absolute",
   right: 12,
-  top: 12,
+  top: "50%",
+  transform: "translateY(-50%)",
   cursor: "pointer",
   fontSize: 16,
 };
 
 const btn = {
-  marginTop: 8,
+  marginTop: 10,
   padding: 12,
   background: "#2563eb",
   color: "#fff",
@@ -181,12 +211,12 @@ const btn = {
 };
 
 const googleWrap = {
-  marginTop: 15,
+  marginTop: 18,
   display: "flex",
   justifyContent: "center",
 };
 
-const bottom = { marginTop: 15, fontSize: 14 };
+const bottom = { marginTop: 18, fontSize: 14 };
 
 const link = {
   color: "#2563eb",
