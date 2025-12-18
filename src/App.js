@@ -1,41 +1,44 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 
-// ------------------- AUTH -------------------
+// AUTH
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import VerifyOTP from "./pages/Auth/VerifyOTP";
 import ResetPassword from "./pages/Auth/ResetPassword";
 
-// ------------------- DASHBOARDS -------------------
-import AdminDashboard from "./pages/AdminDashboard";       // ✅ HR ADMIN
-import EmployeeDashboard from "./pages/EmployeeDashboard"; // ✅ EMPLOYEE
+// DASHBOARDS
+import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 
-// ------------------- EMPLOYEES -------------------
+// EMPLOYEES
 import EmployeeList from "./pages/Employees/EmployeeList";
 import AddEmployee from "./pages/Employees/AddEmployee";
 import EditEmployee from "./pages/Employees/EditEmployee";
 import EmployeeSalary from "./pages/Employees/EmployeeSalary";
 
-// ------------------- PAYROLL -------------------
+// PAYROLL
 import PayrollList from "./pages/Payroll/PayrollList";
 import AddPayroll from "./pages/Payroll/AddPayroll";
 
-// ------------------- ATTENDANCE -------------------
+// ATTENDANCE
 import AttendanceActions from "./pages/Attendance/AttendanceActions";
 import AttendanceList from "./pages/Attendance/AttendanceList";
 import HRWorkingHours from "./pages/Attendance/HRWorkingHours";
 
-// ------------------- LEAVE -------------------
+// LEAVE
 import LeaveList from "./pages/Leave/LeaveList";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
 import LeaveApproval from "./pages/Leave/LeaveApproval";
+
+const SIDEBAR_WIDTH = 240; // ✅ MUST MATCH Sidebar.js
 
 function AppLayout() {
   const location = useLocation();
 
   const hideSidebarRoutes = [
+    "/",
     "/login",
     "/register",
     "/forgot-password",
@@ -43,21 +46,23 @@ function AppLayout() {
     "/reset-password",
   ];
 
-  const shouldHideSidebar = hideSidebarRoutes.includes(location.pathname);
+  const hideSidebar = hideSidebarRoutes.includes(location.pathname);
 
   return (
     <>
-      {!shouldHideSidebar && <Sidebar />}
+      {!hideSidebar && <Sidebar />}
 
-      <div
+      <main
         style={{
-          marginLeft: shouldHideSidebar ? "0px" : "220px",
-          padding: "20px",
+          marginLeft: hideSidebar ? 0 : SIDEBAR_WIDTH,
+          minHeight: "100vh",
+          padding: 24,
+          background: "#F8FAFC",
+          transition: "0.3s",
         }}
       >
         <Routes>
-
-          {/* AUTH ROUTES */}
+          {/* AUTH */}
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -66,8 +71,8 @@ function AppLayout() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* DASHBOARDS */}
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />       {/* HR Admin Dashboard */}
-          <Route path="/employee-dashboard" element={<EmployeeDashboard />} /> {/* Employee Dashboard */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
 
           {/* EMPLOYEES */}
           <Route path="/employees" element={<EmployeeList />} />
@@ -89,17 +94,15 @@ function AppLayout() {
           <Route path="/leave/apply" element={<ApplyLeave />} />
           <Route path="/leave/approve" element={<LeaveApproval />} />
         </Routes>
-      </div>
+      </main>
     </>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <Router>
       <AppLayout />
     </Router>
   );
 }
-
-export default App;
