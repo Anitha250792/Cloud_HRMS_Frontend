@@ -8,22 +8,23 @@ function LiveWorkingHours() {
 
   // Load today's attendance
   useEffect(() => {
-    api.get("/attendance/my-today/")
-      .then(res => {
-        if (res.data.check_in) {
-          const inTime = new Date(res.data.check_in);
-          setCheckIn(inTime);
-          setCheckOut(res.data.check_out);
+  api.get("/api/attendance/my-today/")
+    .then(res => {
+      if (res.data.check_in) {
+        const inTime = new Date(res.data.check_in);
+        setCheckIn(inTime);
+        setCheckOut(res.data.check_out);
 
-          const baseSeconds = res.data.working_hours
-            ? res.data.working_hours * 3600
-            : Math.floor((Date.now() - inTime.getTime()) / 1000);
+        const baseSeconds = res.data.working_hours
+          ? res.data.working_hours * 3600
+          : Math.floor((Date.now() - inTime.getTime()) / 1000);
 
-          setSeconds(baseSeconds);
-        }
-      })
-      .catch(console.error);
-  }, []);
+        setSeconds(baseSeconds);
+      }
+    })
+    .catch(console.error);
+}, []);
+
 
   // Live counter
   useEffect(() => {

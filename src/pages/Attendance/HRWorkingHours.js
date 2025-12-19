@@ -10,10 +10,10 @@ function HRWorkingHours() {
 
  const loadRecords = async () => {
   try {
-    const res = await api.get("/api/attendance/");
+    const res = await api.get("/api/attendance/records/");
     setRecords(res.data);
   } catch (err) {
-    console.error("Failed to load attendance records", err);
+    console.error(err);
   }
 };
 

@@ -15,13 +15,14 @@ function AttendanceLive() {
   }, []);
 
   const loadLiveData = async () => {
-    try {
-      const res = await api.get("attendance/tools/realtime/");
-      setRecords(res.data);
-    } catch (err) {
-      console.error("Live check-in fetch error:", err);
-    }
-  };
+  try {
+    const res = await api.get("/api/attendance/realtime/");
+    setRecords(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   return (
     <div style={pageWrapper}>

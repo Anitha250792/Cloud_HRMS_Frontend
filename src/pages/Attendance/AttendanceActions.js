@@ -7,116 +7,70 @@ function AttendanceActions() {
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const employeeId = localStorage.getItem("employee_id");
-
   useEffect(() => {
     loadTodayStatus();
   }, []);
 
-  /* -------------------- LOAD TODAY'S ATTENDANCE -------------------- */
   const loadTodayStatus = async () => {
     try {
-      const res = await api.get("attendance/records/");
+      const res = await api.get("/api/attendance/my-today/");
 
-      const today = new Date().toISOString().split("T")[0];
-
-      const record = res.data.find(
-        (r) =>
-          r.employee_id === Number(employeeId) &&
-          r.check_in?.startsWith(today)
-      );
-
-      if (!record) {
+      if (res.data.status === "NOT_MARKED") {
         setStatus("Not Checked In");
         return;
       }
 
-      setCheckInTime(record.check_in);
-      setCheckOutTime(record.check_out);
-
-      setStatus(record.check_out ? "Checked Out" : "Checked In");
+      setStatus(res.data.status);
+      setCheckInTime(res.data.check_in);
+      setCheckOutTime(res.data.check_out);
     } catch (err) {
-      console.error("Load today status error:", err);
+      console.error(err);
+      setStatus("Error");
     }
   };
 
-  /* -------------------------- CHECK IN --------------------------- */
   const handleCheckIn = async () => {
     setLoading(true);
     try {
-      const res = await api.post("/api/attendance/check-in/", {
-        employee_id: employeeId,
-      });
-
+      const res = await api.post("/api/attendance/check-in/");
       setStatus("Checked In");
       setCheckInTime(res.data.data.check_in);
     } catch (err) {
-      console.error("Check-in error:", err);
+      alert(err.response?.data?.error || "Check-in failed");
     }
     setLoading(false);
   };
 
-  /* -------------------------- CHECK OUT --------------------------- */
   const handleCheckOut = async () => {
     setLoading(true);
     try {
-      const res = await api.post("/api/attendance/check-out/", {
-        employee_id: employeeId,
-      });
-
+      const res = await api.post("/api/attendance/check-out/");
       setStatus("Checked Out");
       setCheckOutTime(res.data.data.check_out);
     } catch (err) {
-      console.error("Check-out error:", err);
+      alert(err.response?.data?.error || "Check-out failed");
     }
     setLoading(false);
   };
 
-  /* ------------------------------ UI ------------------------------ */
   return (
-    <div style={page}>
-      <h2 style={title}>⏱ Attendance — Check-in / Check-out</h2>
+    <div>
+      <h2>Attendance</h2>
+      <h3>{status}</h3>
 
-      <div style={card}>
-        <p style={label}>Today's Status</p>
-        <h3 style={value}>{status}</h3>
+      {checkInTime && <p>In: {new Date(checkInTime).toLocaleTimeString()}</p>}
+      {checkOutTime && <p>Out: {new Date(checkOutTime).toLocaleTimeString()}</p>}
 
-        {checkInTime && (
-          <p style={info}>✔ Checked in at: {new Date(checkInTime).toLocaleTimeString()}</p>
-        )}
+      <button disabled={loading || status !== "Not Checked In"} onClick={handleCheckIn}>
+        Check In
+      </button>
 
-        {checkOutTime && (
-          <p style={info}>✔ Checked out at: {new Date(checkOutTime).toLocaleTimeString()}</p>
-        )}
-
-        <div style={btnRow}>
-          <button
-            style={{
-              ...btn,
-              background: status === "Not Checked In" ? "#22c55e" : "#9ca3af",
-            }}
-            disabled={status !== "Not Checked In" || loading}
-            onClick={handleCheckIn}
-          >
-            {loading ? "Processing..." : "Check In"}
-          </button>
-
-          <button
-            style={{
-              ...btn,
-              background: status === "Checked In" ? "#ef4444" : "#9ca3af",
-            }}
-            disabled={status !== "Checked In" || loading}
-            onClick={handleCheckOut}
-          >
-            {loading ? "Processing..." : "Check Out"}
-          </button>
-        </div>
-      </div>
+      <button disabled={loading || status !== "Checked In"} onClick={handleCheckOut}>
+        Check Out
+      </button>
     </div>
   );
 }
-
 /* ------------------------------ STYLES ------------------------------ */
 
 const page = {
