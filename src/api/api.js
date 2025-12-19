@@ -1,27 +1,15 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://cloud-hrms-1.onrender.com/api/",
+  baseURL: "https://cloud-hrms-1.onrender.com",
 });
 
-/* ---------- Attach access token (EXCEPT login/register) ---------- */
+/* ---------- Attach access token ---------- */
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
-
-  const noAuthUrls = [
-    "auth/login/",
-    "auth/register/",
-    "auth/token/refresh/",
-  ];
-
-  const isNoAuth = noAuthUrls.some((url) =>
-    config.url?.includes(url)
-  );
-
-  if (token && !isNoAuth) {
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
@@ -64,9 +52,10 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://cloud-hrms-1.onrender.com/api/auth/token/refresh/",
-          { refresh }
-        );
+  "https://cloud-hrms-1.onrender.com/api/auth/token/refresh/",
+  { refresh }
+);
+
 
         localStorage.setItem("access", res.data.access);
         processQueue(null, res.data.access);
@@ -74,7 +63,6 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization =
           "Bearer " + res.data.access;
-
         return api(originalRequest);
       } catch (err) {
         processQueue(err);
