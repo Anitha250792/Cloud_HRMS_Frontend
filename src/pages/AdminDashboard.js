@@ -4,37 +4,21 @@ import api from "../api/api";
 function AdminDashboard() {
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [pendingLeaves, setPendingLeaves] = useState(0);
-  const [todayPresent, setTodayPresent] = useState(0);
   const [payrollTotal, setPayrollTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  api.get("/api/dashboard/stats/").then(res => {
-    setTotalEmployees(res.data.total_employees);
-  });
-}, []);
+    loadAdminData();
+  }, []);
 
   const loadAdminData = async () => {
     try {
-      /* ✅ TOTAL ACTIVE EMPLOYEES */
-      const empRes = await api.get("employees/");
-      setTotalEmployees(empRes.data.length);
+      const res = await api.get("/api/dashboard/stats/");
+      console.log("Admin stats:", res.data);
 
-      /* ✅ PENDING LEAVES */
-      const leaveRes = await api.get("leave/");
-      const pending = leaveRes.data.filter(
-        (l) => l.status === "PENDING"
-      );
-      setPendingLeaves(pending.length);
-
-      /* ✅ PRESENT TODAY (CORRECT ENDPOINT) */
-      const attendanceRes = await api.get("attendance/summary/today/");
-      setTodayPresent(attendanceRes.data.present_employees || 0);
-
-      /* ✅ PAYROLL SUMMARY */
-      const payrollRes = await api.get("payroll/summary/");
-      setPayrollTotal(payrollRes.data?.total_net_salary || 0);
-
+      setTotalEmployees(res.data.total_employees || 0);
+      setPendingLeaves(res.data.pending_leaves || 0);
+      setPayrollTotal(res.data.payroll_this_month || 0);
     } catch (err) {
       console.error("Admin dashboard error:", err);
     } finally {
@@ -52,7 +36,6 @@ function AdminDashboard() {
 
       <div style={grid}>
         <Card label="Total Employees" value={totalEmployees} />
-        <Card label="Present Today" value={todayPresent} />
         <Card label="Pending Leaves" value={pendingLeaves} />
         <Card label="Payroll This Month" value={`₹ ${payrollTotal}`} />
       </div>
