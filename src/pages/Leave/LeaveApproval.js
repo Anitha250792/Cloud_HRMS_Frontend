@@ -3,10 +3,17 @@ import api from "../../api/api";
 
 function LeaveApproval() {
   const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const loadLeaves = async () => {
-    const res = await api.get("leave/");
-    setLeaves(res.data.filter(l => l.status === "PENDING"));
+    try {
+      const res = await api.get("leave/");
+      setLeaves(res.data.filter((l) => l.status === "PENDING"));
+    } catch (err) {
+      console.error("Failed to load leaves", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -14,9 +21,17 @@ function LeaveApproval() {
   }, []);
 
   const updateStatus = async (id, action) => {
-    await api.post(`leave/${id}/${action}/`);
-    loadLeaves();
+    try {
+      await api.post(`leave/${id}/${action}/`);
+      loadLeaves();
+    } catch (err) {
+      alert("Action failed");
+    }
   };
+
+  if (loading) {
+    return <p style={{ textAlign: "center" }}>Loading...</p>;
+  }
 
   return (
     <div style={styles.page}>
@@ -35,11 +50,13 @@ function LeaveApproval() {
           </thead>
 
           <tbody>
-            {leaves.map(l => (
+            {leaves.map((l) => (
               <tr key={l.id}>
                 <td>{l.employee_name}</td>
                 <td>{l.leave_type}</td>
-                <td>{l.start_date} → {l.end_date}</td>
+                <td>
+                  {l.start_date} → {l.end_date}
+                </td>
                 <td>{l.reason}</td>
                 <td>
                   <button
@@ -74,6 +91,7 @@ function LeaveApproval() {
 
 export default LeaveApproval;
 
+/* styles */
 const styles = {
   page: {
     minHeight: "100vh",

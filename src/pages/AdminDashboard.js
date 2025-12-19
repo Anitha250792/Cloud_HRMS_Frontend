@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import api from "../api/api";
 
 function AdminDashboard() {
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  const [pendingLeaves, setPendingLeaves] = useState(0);
-  const [payrollTotal, setPayrollTotal] = useState(0);
+  const [stats, setStats] = useState({
+    totalEmployees: 0,
+    pendingLeaves: 0,
+    presentToday: 0,
+    payrollTotal: 0,
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,12 +17,30 @@ function AdminDashboard() {
 
   const loadAdminData = async () => {
     try {
-      const res = await api.get("/api/dashboard/stats/");
-      console.log("Admin stats:", res.data);
+      /* 👥 Employees */
+      const empRes = await api.get("employees/");
+      const totalEmployees = empRes.data.length;
 
-      setTotalEmployees(res.data.total_employees || 0);
-      setPendingLeaves(res.data.pending_leaves || 0);
-      setPayrollTotal(res.data.payroll_this_month || 0);
+      /* 🌴 Leaves */
+      const leaveRes = await api.get("leave/");
+      const pendingLeaves = leaveRes.data.filter(
+        (l) => l.status === "PENDING"
+      ).length;
+
+      /* 🕒 Attendance */
+      const attendanceRes = await api.get("attendance/summary/today/");
+      const presentToday = attendanceRes.data.present_employees || 0;
+
+      /* 💰 Payroll */
+      const payrollRes = await api.get("payroll/summary/");
+      const payrollTotal = payrollRes.data?.total_net_salary || 0;
+
+      setStats({
+        totalEmployees,
+        pendingLeaves,
+        presentToday,
+        payrollTotal,
+      });
     } catch (err) {
       console.error("Admin dashboard error:", err);
     } finally {
@@ -35,15 +57,16 @@ function AdminDashboard() {
       <h2 style={title}>📊 HR / Admin Dashboard</h2>
 
       <div style={grid}>
-        <Card label="Total Employees" value={totalEmployees} />
-        <Card label="Pending Leaves" value={pendingLeaves} />
-        <Card label="Payroll This Month" value={`₹ ${payrollTotal}`} />
+        <Card label="Total Employees" value={stats.totalEmployees} />
+        <Card label="Present Today" value={stats.presentToday} />
+        <Card label="Pending Leaves" value={stats.pendingLeaves} />
+        <Card label="Payroll This Month" value={`₹ ${stats.payrollTotal}`} />
       </div>
     </div>
   );
 }
 
-/* ---------------- UI CARD ---------------- */
+/* ---------------- CARD ---------------- */
 function Card({ label, value }) {
   return (
     <div style={card}>

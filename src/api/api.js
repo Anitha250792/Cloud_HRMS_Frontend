@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://cloud-hrms-1.onrender.com",
+  baseURL: "https://cloud-hrms-1.onrender.com/api/",
 });
 
 /* ---------- Attach access token ---------- */
@@ -52,10 +52,9 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-  "https://cloud-hrms-1.onrender.com/api/auth/token/refresh/",
-  { refresh }
-);
-
+          "https://cloud-hrms-1.onrender.com/api/auth/token/refresh/",
+          { refresh }
+        );
 
         localStorage.setItem("access", res.data.access);
         processQueue(null, res.data.access);

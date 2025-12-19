@@ -3,7 +3,6 @@ import api from "../../api/api";
 
 function ApplyLeave() {
   const [form, setForm] = useState({
-    employee: "",
     leave_type: "",
     start_date: "",
     end_date: "",
@@ -23,8 +22,14 @@ function ApplyLeave() {
     try {
       await api.post("leave/apply/", form);
       setMsg("✅ Leave applied successfully");
+      setForm({
+        leave_type: "",
+        start_date: "",
+        end_date: "",
+        reason: "",
+      });
     } catch (err) {
-      setError(err.response?.data?.error || "❌ Failed");
+      setError(err.response?.data?.error || "❌ Failed to apply leave");
     }
   };
 
@@ -36,19 +41,46 @@ function ApplyLeave() {
         {msg && <p style={success}>{msg}</p>}
         {error && <p style={errorBox}>{error}</p>}
 
-        <input name="employee" placeholder="Employee Code" onChange={handleChange} style={input} />
-        <select name="leave_type" onChange={handleChange} style={input}>
-          <option value="">Select Leave</option>
+        <select
+          name="leave_type"
+          value={form.leave_type}
+          onChange={handleChange}
+          style={input}
+        >
+          <option value="">Select Leave Type</option>
           <option value="CASUAL">Casual</option>
           <option value="SICK">Sick</option>
           <option value="EARNED">Earned</option>
           <option value="UNPAID">Unpaid</option>
         </select>
-        <input type="date" name="start_date" onChange={handleChange} style={input} />
-        <input type="date" name="end_date" onChange={handleChange} style={input} />
-        <textarea name="reason" placeholder="Reason" onChange={handleChange} style={input} />
 
-        <button onClick={applyLeave} style={btn}>Apply</button>
+        <input
+          type="date"
+          name="start_date"
+          value={form.start_date}
+          onChange={handleChange}
+          style={input}
+        />
+
+        <input
+          type="date"
+          name="end_date"
+          value={form.end_date}
+          onChange={handleChange}
+          style={input}
+        />
+
+        <textarea
+          name="reason"
+          placeholder="Reason"
+          value={form.reason}
+          onChange={handleChange}
+          style={input}
+        />
+
+        <button onClick={applyLeave} style={btn}>
+          Apply Leave
+        </button>
       </div>
     </div>
   );
@@ -57,9 +89,45 @@ function ApplyLeave() {
 export default ApplyLeave;
 
 /* styles */
-const page = { minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#f4f7fc" };
-const card = { background: "#fff", padding: 30, borderRadius: 12, width: 400 };
-const input = { width: "100%", padding: 10, marginBottom: 12 };
-const btn = { width: "100%", padding: 12, background: "#2563eb", color: "#fff", border: "none" };
-const success = { background: "#d1fae5", padding: 10 };
-const errorBox = { background: "#fee2e2", padding: 10 };
+const page = {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#f4f7fc",
+};
+
+const card = {
+  background: "#fff",
+  padding: 30,
+  borderRadius: 12,
+  width: 400,
+};
+
+const input = {
+  width: "100%",
+  padding: 10,
+  marginBottom: 12,
+};
+
+const btn = {
+  width: "100%",
+  padding: 12,
+  background: "#2563eb",
+  color: "#fff",
+  border: "none",
+  borderRadius: 6,
+  fontWeight: 600,
+};
+
+const success = {
+  background: "#d1fae5",
+  padding: 10,
+  marginBottom: 10,
+};
+
+const errorBox = {
+  background: "#fee2e2",
+  padding: 10,
+  marginBottom: 10,
+};
