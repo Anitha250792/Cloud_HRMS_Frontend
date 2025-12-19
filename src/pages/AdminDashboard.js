@@ -9,8 +9,10 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAdminData();
-  }, []);
+  api.get("/api/dashboard/stats/").then(res => {
+    setTotalEmployees(res.data.total_employees);
+  });
+}, []);
 
   const loadAdminData = async () => {
     try {
