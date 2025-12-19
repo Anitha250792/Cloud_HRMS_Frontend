@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
+import RequireAuth from "./components/RequireAuth";
 
 // AUTH
 import Login from "./pages/Auth/Login";
@@ -17,8 +18,6 @@ import EmployeeList from "./pages/Employees/EmployeeList";
 import AddEmployee from "./pages/Employees/AddEmployee";
 import EditEmployee from "./pages/Employees/EditEmployee";
 import EmployeeSalary from "./pages/Employees/EmployeeSalary";
-import RequireAuth from "./components/RequireAuth";
-
 
 // PAYROLL
 import PayrollList from "./pages/Payroll/PayrollList";
@@ -34,7 +33,7 @@ import LeaveList from "./pages/Leave/LeaveList";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
 import LeaveApproval from "./pages/Leave/LeaveApproval";
 
-const SIDEBAR_WIDTH = 240; // ✅ MUST MATCH Sidebar.js
+const SIDEBAR_WIDTH = 240;
 
 function AppLayout() {
   const location = useLocation();
@@ -64,7 +63,7 @@ function AppLayout() {
         }}
       >
         <Routes>
-          {/* AUTH */}
+          {/* ================= PUBLIC ROUTES ================= */}
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -72,47 +71,32 @@ function AppLayout() {
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* DASHBOARDS */}
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+          {/* ================= PROTECTED ROUTES ================= */}
+          <Route element={<RequireAuth />}>
+            {/* DASHBOARDS */}
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
 
-          {/* EMPLOYEES */}
-          <Route path="/employees" element={<EmployeeList />} />
-          <Route path="/employees/add" element={<AddEmployee />} />
-          <Route path="/employees/edit/:id" element={<EditEmployee />} />
-          <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
-          <Route
-  path="/employees/add"
-  element={
-    <RequireAuth>
-      <AddEmployee />
-    </RequireAuth>
-  }
-/>
+            {/* EMPLOYEES */}
+            <Route path="/employees" element={<EmployeeList />} />
+            <Route path="/employees/add" element={<AddEmployee />} />
+            <Route path="/employees/edit/:id" element={<EditEmployee />} />
+            <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
 
-<Route
-  path="/employees"
-  element={
-    <RequireAuth>
-      <EmployeeList />
-    </RequireAuth>
-  }
-/>
+            {/* PAYROLL */}
+            <Route path="/payroll" element={<PayrollList />} />
+            <Route path="/payroll/add" element={<AddPayroll />} />
 
+            {/* ATTENDANCE */}
+            <Route path="/attendance" element={<AttendanceList />} />
+            <Route path="/attendance/actions" element={<AttendanceActions />} />
+            <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
 
-          {/* PAYROLL */}
-          <Route path="/payroll" element={<PayrollList />} />
-          <Route path="/payroll/add" element={<AddPayroll />} />
-
-          {/* ATTENDANCE */}
-          <Route path="/attendance" element={<AttendanceList />} />
-          <Route path="/attendance/actions" element={<AttendanceActions />} />
-          <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
-
-          {/* LEAVE */}
-          <Route path="/leave" element={<LeaveList />} />
-          <Route path="/leave/apply" element={<ApplyLeave />} />
-          <Route path="/leave/approve" element={<LeaveApproval />} />
+            {/* LEAVE */}
+            <Route path="/leave" element={<LeaveList />} />
+            <Route path="/leave/apply" element={<ApplyLeave />} />
+            <Route path="/leave/approve" element={<LeaveApproval />} />
+          </Route>
         </Routes>
       </main>
     </>
