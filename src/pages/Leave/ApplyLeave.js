@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/api";
 
 function ApplyLeave() {
+  const [employeeCode, setEmployeeCode] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const [form, setForm] = useState({
     leave_type: "",
     start_date: "",
@@ -12,6 +15,22 @@ function ApplyLeave() {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
+  /* 🔹 Fetch logged-in employee code */
+  useEffect(() => {
+    fetchEmployee();
+  }, []);
+
+  const fetchEmployee = async () => {
+    try {
+      const res = await api.get("/api/employees/me/");
+      setEmployeeCode(res.data.emp_code);
+    } catch (err) {
+      setError("Unable to identify employee");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -20,7 +39,11 @@ function ApplyLeave() {
     setError("");
 
     try {
-      await api.post("/api/leave/apply/", form);
+      await api.post("/api/leave/apply/", {
+        employee: employeeCode, // ✅ REQUIRED BY BACKEND
+        ...form,
+      });
+
       setMsg("✅ Leave applied successfully");
       setForm({
         leave_type: "",
@@ -31,10 +54,14 @@ function ApplyLeave() {
     } catch (err) {
       setError(
         err.response?.data?.error ||
-          "❌ You are not allowed to apply leave"
+          "❌ Failed to apply leave"
       );
     }
   };
+
+  if (loading) {
+    return <p style={{ textAlign: "center" }}>Loading...</p>;
+  }
 
   return (
     <div style={page}>
@@ -43,6 +70,13 @@ function ApplyLeave() {
 
         {msg && <p style={success}>{msg}</p>}
         {error && <p style={errorBox}>{error}</p>}
+
+        {/* Employee Code (read-only, hidden from user input) */}
+        <input
+          value={employeeCode}
+          disabled
+          style={{ ...input, background: "#f3f4f6" }}
+        />
 
         <select
           name="leave_type"

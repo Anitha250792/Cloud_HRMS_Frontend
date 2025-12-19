@@ -10,49 +10,33 @@ function AdminDashboard() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    loadAdminData();
+    loadDashboard();
   }, []);
 
-  const loadAdminData = async () => {
+  const loadDashboard = async () => {
     try {
-      /* 👥 Employees */
-      const empRes = await api.get("/api/employees/");
-      const totalEmployees = empRes.data.length;
-
-      /* 🌴 Leaves */
-      const leaveRes = await api.get("/api/leave/");
-      const pendingLeaves = leaveRes.data.filter(
-        (l) => l.status === "PENDING"
-      ).length;
-
-      /* 🕒 Attendance */
-      const attendanceRes = await api.get("/api/attendance/summary/today/");
-      const presentToday =
-        attendanceRes.data.present_employees || 0;
-
-      /* 💰 Payroll */
-      const payrollRes = await api.get("/api/payroll/summary/");
-      const payrollTotal =
-        payrollRes.data?.total_net_salary || 0;
+      const res = await api.get("/api/dashboard/stats/");
+      console.log("Dashboard stats:", res.data);
 
       setStats({
-        totalEmployees,
-        presentToday,
-        pendingLeaves,
-        payrollTotal,
+        totalEmployees: res.data.total_employees || 0,
+        pendingLeaves: res.data.pending_leaves || 0,
+        payrollTotal: res.data.payroll_this_month || 0,
+        presentToday: res.data.present_today || 0, // optional
       });
     } catch (err) {
-      console.error("Admin dashboard error:", err);
+      console.error(err);
+      setError("Failed to load dashboard");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return <div style={loadingBox}>Loading HR Dashboard...</div>;
-  }
+  if (loading) return <div style={loadingBox}>Loading HR Dashboard…</div>;
+  if (error) return <div style={loadingBox}>{error}</div>;
 
   return (
     <div style={page}>
