@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import api from "../../api/api";
 
 function ApplyLeave() {
-  const [employeeCode, setEmployeeCode] = useState("");
-  const [loading, setLoading] = useState(true);
+  const user = JSON.parse(localStorage.getItem("user")); // ✅
+  const employeeCode = user?.emp_code;                  // ✅
 
   const [form, setForm] = useState({
     leave_type: "",
@@ -15,22 +15,6 @@ function ApplyLeave() {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
-  /* 🔹 Fetch logged-in employee code */
-  useEffect(() => {
-    fetchEmployee();
-  }, []);
-
-  const fetchEmployee = async () => {
-    try {
-      const res = await api.get("/api/employees/me/");
-      setEmployeeCode(res.data.emp_code);
-    } catch (err) {
-      setError("Unable to identify employee");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -38,9 +22,14 @@ function ApplyLeave() {
     setMsg("");
     setError("");
 
+    if (!employeeCode) {
+      setError("Employee code not found. Please login again.");
+      return;
+    }
+
     try {
       await api.post("/api/leave/apply/", {
-        employee: employeeCode, // ✅ REQUIRED BY BACKEND
+        employee: employeeCode,   // ✅ REQUIRED
         ...form,
       });
 
@@ -54,14 +43,10 @@ function ApplyLeave() {
     } catch (err) {
       setError(
         err.response?.data?.error ||
-          "❌ Failed to apply leave"
+        "Failed to apply leave"
       );
     }
   };
-
-  if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading...</p>;
-  }
 
   return (
     <div style={page}>
@@ -71,11 +56,10 @@ function ApplyLeave() {
         {msg && <p style={success}>{msg}</p>}
         {error && <p style={errorBox}>{error}</p>}
 
-        {/* Employee Code (read-only, hidden from user input) */}
         <input
-          value={employeeCode}
+          value={employeeCode || ""}
           disabled
-          style={{ ...input, background: "#f3f4f6" }}
+          style={{ ...input, background: "#f1f5f9" }}
         />
 
         <select
@@ -91,39 +75,18 @@ function ApplyLeave() {
           <option value="UNPAID">Unpaid</option>
         </select>
 
-        <input
-          type="date"
-          name="start_date"
-          value={form.start_date}
-          onChange={handleChange}
-          style={input}
-        />
+        <input type="date" name="start_date" onChange={handleChange} style={input} />
+        <input type="date" name="end_date" onChange={handleChange} style={input} />
+        <textarea name="reason" onChange={handleChange} style={input} />
 
-        <input
-          type="date"
-          name="end_date"
-          value={form.end_date}
-          onChange={handleChange}
-          style={input}
-        />
-
-        <textarea
-          name="reason"
-          placeholder="Reason"
-          value={form.reason}
-          onChange={handleChange}
-          style={input}
-        />
-
-        <button onClick={applyLeave} style={btn}>
-          Apply Leave
-        </button>
+        <button onClick={applyLeave} style={btn}>Apply Leave</button>
       </div>
     </div>
   );
 }
 
 export default ApplyLeave;
+
 
 /* styles */
 const page = {
