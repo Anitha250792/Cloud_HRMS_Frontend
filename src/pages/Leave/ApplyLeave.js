@@ -53,9 +53,18 @@ function ApplyLeave() {
         {msg && <p style={success}>{msg}</p>}
         {error && <p style={errorBox}>{error}</p>}
 
-        <input value={empCode || ""} disabled style={input} />
+        <input
+          value={empCode || ""}
+          disabled
+          style={{ ...input, background: "#f1f5f9" }}
+        />
 
-        <select name="leave_type" value={form.leave_type} onChange={handleChange} style={input}>
+        <select
+          name="leave_type"
+          value={form.leave_type}
+          onChange={handleChange}
+          style={input}
+        >
           <option value="">Select Leave Type</option>
           <option value="CASUAL">Casual</option>
           <option value="SICK">Sick</option>
@@ -63,14 +72,88 @@ function ApplyLeave() {
           <option value="UNPAID">Unpaid</option>
         </select>
 
-        <input type="date" name="start_date" value={form.start_date} onChange={handleChange} style={input} />
-        <input type="date" name="end_date" value={form.end_date} onChange={handleChange} style={input} />
-        <textarea name="reason" value={form.reason} onChange={handleChange} style={input} />
+        <input
+          type="date"
+          name="start_date"
+          value={form.start_date}
+          onChange={handleChange}
+          style={input}
+        />
 
-        <button onClick={applyLeave} style={btn}>Apply Leave</button>
+        <input
+          type="date"
+          name="end_date"
+          value={form.end_date}
+          onChange={handleChange}
+          style={input}
+        />
+
+        <textarea
+          name="reason"
+          value={form.reason}
+          onChange={handleChange}
+          style={input}
+        />
+
+        <button onClick={applyLeave} style={btn}>
+          Apply Leave
+        </button>
       </div>
     </div>
   );
 }
 
 export default ApplyLeave;
+
+/* ================= STYLES ================= */
+
+const page = {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#f4f7fc",
+};
+
+const card = {
+  background: "#ffffff",
+  padding: 30,
+  borderRadius: 14,
+  width: 400,
+  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+};
+
+const input = {
+  width: "100%",
+  padding: 10,
+  marginBottom: 12,
+  borderRadius: 8,
+  border: "1px solid #cbd5e1",
+};
+
+const btn = {
+  width: "100%",
+  padding: 12,
+  background: "#2563eb",
+  color: "#fff",
+  border: "none",
+  borderRadius: 8,
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const success = {
+  background: "#dcfce7",
+  color: "#166534",
+  padding: 10,
+  borderRadius: 8,
+  marginBottom: 12,
+};
+
+const errorBox = {
+  background: "#fee2e2",
+  color: "#7f1d1d",
+  padding: 10,
+  borderRadius: 8,
+  marginBottom: 12,
+};
