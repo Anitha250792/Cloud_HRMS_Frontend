@@ -22,44 +22,43 @@ function AddEmployee() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    const payload = {
-      emp_code: form.emp_code.trim(),
-      name: form.name.trim(),
-      email: form.email.trim(),
-      department: form.department.trim(),
-      role: form.role.trim(),
-      salary: Number(form.salary),
-      date_joined: form.date_joined,
-    };
-
-    try {
-      const res = await api.post("employees/create/", payload);
-
-      if (res.data.action === "created") {
-        alert("✅ Employee created successfully");
-        navigate("/employees");
-      }
-
-      if (res.data.action === "edit") {
-        alert("ℹ️ Employee already exists. Redirecting to Edit page...");
-        navigate(`/employees/edit/${res.data.employee_id}`);
-      }
-
-    } catch (err) {
-      if (err.response?.data) {
-        const firstError = Object.values(err.response.data)[0][0];
-        setError(firstError);
-      } else {
-        setError("❌ Failed to add employee");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const payload = {
+    emp_code: form.emp_code.trim(),
+    name: form.name.trim(),
+    email: form.email.trim(),
+    department: form.department.trim(),
+    role: form.role.trim(),
+    salary: Number(form.salary),
+    date_joined: form.date_joined,
   };
+
+  try {
+    const res = await api.post("/api/employees/create/", payload);
+
+    if (res.data.action === "created") {
+      alert("✅ Employee created successfully");
+      navigate("/employees");
+    }
+
+    if (res.data.action === "edit") {
+      alert("ℹ️ Employee already exists. Redirecting to Edit page...");
+      navigate(`/employees/edit/${res.data.employee_id}`);
+    }
+  } catch (err) {
+    if (err.response?.data) {
+      const firstError = Object.values(err.response.data)[0][0];
+      setError(firstError);
+    } else {
+      setError("❌ Failed to add employee");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={wrapper}>

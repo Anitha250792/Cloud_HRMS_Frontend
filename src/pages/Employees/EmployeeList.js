@@ -17,7 +17,7 @@ function EmployeeList() {
 
   const loadEmployees = async () => {
     try {
-      const res = await api.get("employees/");
+      const res = await api.get("/api/employees/");
       setEmployees(res.data);
     } catch (err) {
       console.error("Employee list error:", err);
@@ -31,7 +31,7 @@ function EmployeeList() {
     setError("");
 
     try {
-      await api.delete(`employees/delete/${selectedEmployee.id}/`);
+      await api.delete(`/api/employees/delete/${selectedEmployee.id}/`);
       setShowModal(false);
       setSelectedEmployee(null);
       loadEmployees();
