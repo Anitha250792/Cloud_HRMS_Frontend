@@ -14,28 +14,29 @@ export default function Login() {
     password: "",
   });
 
-  /* ---------------- LOGIN ---------------- */
+  /* ================= LOGIN ================= */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      // ✅ CORRECT ENDPOINT
       const res = await api.post("/api/auth/login/", {
         email: formData.email,
         password: formData.password,
       });
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-      localStorage.setItem("role", res.data.role);
+      const { access, refresh, role } = res.data;
+
+      localStorage.setItem("access", access);
+      localStorage.setItem("refresh", refresh);
+      localStorage.setItem("role", role);
 
       // ✅ ROLE BASED REDIRECT
-      if (res.data.role === "HR") {
-        navigate("/admin-dashboard");
+      if (role === "HR") {
+        navigate("/admin-dashboard", { replace: true });
       } else {
-        navigate("/employee-dashboard");
+        navigate("/employee-dashboard", { replace: true });
       }
     } catch (err) {
       setError(
@@ -48,19 +49,20 @@ export default function Login() {
     }
   };
 
-  /* ---------------- GOOGLE LOGIN ---------------- */
+  /* ================= GOOGLE LOGIN ================= */
   const handleGoogleLogin = async (credential) => {
     try {
       const res = await api.post("/api/auth/google/", { credential });
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-      localStorage.setItem("role", res.data.role);
+      const { access, refresh, role } = res.data;
+
+      localStorage.setItem("access", access);
+      localStorage.setItem("refresh", refresh);
+      localStorage.setItem("role", role);
 
       navigate(
-        res.data.role === "HR"
-          ? "/admin-dashboard"
-          : "/employee-dashboard"
+        role === "HR" ? "/admin-dashboard" : "/employee-dashboard",
+        { replace: true }
       );
     } catch {
       setError("Google login failed ❌");
@@ -107,6 +109,7 @@ export default function Login() {
             <span
               style={eye}
               onClick={() => setShowPassword(!showPassword)}
+              title="Show / Hide password"
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
@@ -136,7 +139,7 @@ export default function Login() {
   );
 }
 
-/* ---------------- STYLES ---------------- */
+/* ================= STYLES ================= */
 
 const page = {
   minHeight: "100vh",
@@ -177,7 +180,6 @@ const form = {
   gap: 14,
 };
 
-/* 🔥 KEY FIX */
 const fieldWrapper = {
   position: "relative",
   width: "100%",
@@ -185,7 +187,7 @@ const fieldWrapper = {
 
 const input = {
   width: "100%",
-  padding: "12px 40px 12px 12px", // SAME for email & password
+  padding: "12px 40px 12px 12px", // SAME WIDTH for email & password
   borderRadius: 10,
   border: "1px solid #e5e7eb",
   fontSize: 14,

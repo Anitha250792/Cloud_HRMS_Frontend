@@ -17,6 +17,8 @@ import EmployeeList from "./pages/Employees/EmployeeList";
 import AddEmployee from "./pages/Employees/AddEmployee";
 import EditEmployee from "./pages/Employees/EditEmployee";
 import EmployeeSalary from "./pages/Employees/EmployeeSalary";
+import RequireAuth from "./components/RequireAuth";
+
 
 // PAYROLL
 import PayrollList from "./pages/Payroll/PayrollList";
@@ -79,6 +81,24 @@ function AppLayout() {
           <Route path="/employees/add" element={<AddEmployee />} />
           <Route path="/employees/edit/:id" element={<EditEmployee />} />
           <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
+          <Route
+  path="/employees/add"
+  element={
+    <RequireAuth>
+      <AddEmployee />
+    </RequireAuth>
+  }
+/>
+
+<Route
+  path="/employees"
+  element={
+    <RequireAuth>
+      <EmployeeList />
+    </RequireAuth>
+  }
+/>
+
 
           {/* PAYROLL */}
           <Route path="/payroll" element={<PayrollList />} />

@@ -1,11 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   FiHome,
   FiUsers,
   FiClock,
   FiCalendar,
-  FiFileText,
   FiLogOut,
   FiChevronDown,
   FiChevronRight,
@@ -24,11 +23,21 @@ const COLORS = {
 
 function Sidebar() {
   const location = useLocation();
-  const role = localStorage.getItem("role"); // HR | EMPLOYEE
-  const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
 
-  // ✅ ONE dropdown open at a time (simple + reliable)
+  const [collapsed, setCollapsed] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
+  const [role, setRole] = useState(null);
+
+  /* ✅ SAFE ROLE LOAD */
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    if (!storedRole) {
+      navigate("/login", { replace: true });
+    } else {
+      setRole(storedRole);
+    }
+  }, [navigate]);
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
@@ -37,19 +46,26 @@ function Sidebar() {
   const isActive = (path) => location.pathname === path;
   const isGroupActive = (path) => location.pathname.startsWith(path);
 
+  /* ✅ SAFE LOGOUT */
   const logout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    navigate("/login", { replace: true });
   };
+
+  if (!role) return null; // 🔒 Prevent render flash
 
   return (
     <aside style={styles.sidebar(collapsed)}>
-      {/* Collapse */}
-      <button style={styles.collapseBtn} onClick={() => setCollapsed(!collapsed)}>
+      {/* COLLAPSE BUTTON */}
+      <button
+        style={styles.collapseBtn}
+        onClick={() => setCollapsed(!collapsed)}
+        title={collapsed ? "Expand" : "Collapse"}
+      >
         {collapsed ? "›" : "‹"}
       </button>
 
-      <nav>
+      <nav style={{ overflowY: "auto", height: "100%" }}>
         {/* DASHBOARD */}
         <MenuLink
           icon={<FiHome />}
@@ -124,11 +140,7 @@ function Sidebar() {
               active={isGroupActive("/documents")}
               collapsed={collapsed}
             >
-              <SubLink
-                to="/documents/hr-view"
-                label="Employee Documents"
-                active={isActive("/documents/hr-view")}
-              />
+              <SubLink to="/documents/hr-view" label="Employee Documents" active={isActive("/documents/hr-view")} />
             </Dropdown>
           </>
         )}
@@ -144,16 +156,8 @@ function Sidebar() {
               active={isGroupActive("/attendance")}
               collapsed={collapsed}
             >
-              <SubLink
-                to="/attendance/actions"
-                label="Check In / Out"
-                active={isActive("/attendance/actions")}
-              />
-              <SubLink
-                to="/attendance"
-                label="My Records"
-                active={isActive("/attendance")}
-              />
+              <SubLink to="/attendance/actions" label="Check In / Out" active={isActive("/attendance/actions")} />
+              <SubLink to="/attendance" label="My Records" active={isActive("/attendance")} />
             </Dropdown>
 
             <Dropdown
@@ -227,6 +231,7 @@ const styles = {
     left: 0,
     paddingTop: 80,
     transition: "0.3s",
+    zIndex: 1000,
   }),
 
   collapseBtn: {
@@ -239,6 +244,7 @@ const styles = {
     border: `1px solid ${COLORS.border}`,
     background: "#fff",
     cursor: "pointer",
+    fontWeight: 700,
   },
 
   link: (active) => ({
