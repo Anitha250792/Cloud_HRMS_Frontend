@@ -20,7 +20,7 @@ function ApplyLeave() {
     setError("");
 
     try {
-      await api.post("leave/apply/", form);
+      await api.post("/api/leave/apply/", form);
       setMsg("✅ Leave applied successfully");
       setForm({
         leave_type: "",
@@ -29,7 +29,10 @@ function ApplyLeave() {
         reason: "",
       });
     } catch (err) {
-      setError(err.response?.data?.error || "❌ Failed to apply leave");
+      setError(
+        err.response?.data?.error ||
+          "❌ You are not allowed to apply leave"
+      );
     }
   };
 
@@ -96,20 +99,8 @@ const page = {
   alignItems: "center",
   background: "#f4f7fc",
 };
-
-const card = {
-  background: "#fff",
-  padding: 30,
-  borderRadius: 12,
-  width: 400,
-};
-
-const input = {
-  width: "100%",
-  padding: 10,
-  marginBottom: 12,
-};
-
+const card = { background: "#fff", padding: 30, borderRadius: 12, width: 400 };
+const input = { width: "100%", padding: 10, marginBottom: 12 };
 const btn = {
   width: "100%",
   padding: 12,
@@ -117,17 +108,6 @@ const btn = {
   color: "#fff",
   border: "none",
   borderRadius: 6,
-  fontWeight: 600,
 };
-
-const success = {
-  background: "#d1fae5",
-  padding: 10,
-  marginBottom: 10,
-};
-
-const errorBox = {
-  background: "#fee2e2",
-  padding: 10,
-  marginBottom: 10,
-};
+const success = { background: "#d1fae5", padding: 10, marginBottom: 10 };
+const errorBox = { background: "#fee2e2", padding: 10, marginBottom: 10 };

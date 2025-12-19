@@ -4,8 +4,8 @@ import api from "../api/api";
 function AdminDashboard() {
   const [stats, setStats] = useState({
     totalEmployees: 0,
-    pendingLeaves: 0,
     presentToday: 0,
+    pendingLeaves: 0,
     payrollTotal: 0,
   });
 
@@ -18,27 +18,29 @@ function AdminDashboard() {
   const loadAdminData = async () => {
     try {
       /* 👥 Employees */
-      const empRes = await api.get("employees/");
+      const empRes = await api.get("/api/employees/");
       const totalEmployees = empRes.data.length;
 
       /* 🌴 Leaves */
-      const leaveRes = await api.get("leave/");
+      const leaveRes = await api.get("/api/leave/");
       const pendingLeaves = leaveRes.data.filter(
         (l) => l.status === "PENDING"
       ).length;
 
       /* 🕒 Attendance */
-      const attendanceRes = await api.get("attendance/summary/today/");
-      const presentToday = attendanceRes.data.present_employees || 0;
+      const attendanceRes = await api.get("/api/attendance/summary/today/");
+      const presentToday =
+        attendanceRes.data.present_employees || 0;
 
       /* 💰 Payroll */
-      const payrollRes = await api.get("payroll/summary/");
-      const payrollTotal = payrollRes.data?.total_net_salary || 0;
+      const payrollRes = await api.get("/api/payroll/summary/");
+      const payrollTotal =
+        payrollRes.data?.total_net_salary || 0;
 
       setStats({
         totalEmployees,
-        pendingLeaves,
         presentToday,
+        pendingLeaves,
         payrollTotal,
       });
     } catch (err) {
@@ -60,7 +62,10 @@ function AdminDashboard() {
         <Card label="Total Employees" value={stats.totalEmployees} />
         <Card label="Present Today" value={stats.presentToday} />
         <Card label="Pending Leaves" value={stats.pendingLeaves} />
-        <Card label="Payroll This Month" value={`₹ ${stats.payrollTotal}`} />
+        <Card
+          label="Payroll This Month"
+          value={`₹ ${stats.payrollTotal}`}
+        />
       </div>
     </div>
   );
@@ -77,48 +82,21 @@ function Card({ label, value }) {
 }
 
 /* ---------------- STYLES ---------------- */
-
-const page = {
-  minHeight: "100vh",
-  padding: 24,
-  background: "#F9FAFB",
-};
-
-const title = {
-  fontSize: 26,
-  fontWeight: 800,
-  color: "#1E3A8A",
-  marginBottom: 20,
-};
-
+const page = { minHeight: "100vh", padding: 24, background: "#F9FAFB" };
+const title = { fontSize: 26, fontWeight: 800, marginBottom: 20 };
 const grid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 16,
 };
-
 const card = {
   background: "#fff",
   padding: 22,
   borderRadius: 16,
   boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
 };
-
-const labelStyle = {
-  fontSize: 13,
-  color: "#6B7280",
-};
-
-const valueStyle = {
-  fontSize: 28,
-  fontWeight: 800,
-  color: "#2563EB",
-};
-
-const loadingBox = {
-  fontSize: 18,
-  textAlign: "center",
-  paddingTop: 50,
-};
+const labelStyle = { fontSize: 13, color: "#6B7280" };
+const valueStyle = { fontSize: 28, fontWeight: 800, color: "#2563EB" };
+const loadingBox = { fontSize: 18, textAlign: "center", paddingTop: 50 };
 
 export default AdminDashboard;

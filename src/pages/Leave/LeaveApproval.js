@@ -7,7 +7,7 @@ function LeaveApproval() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("leave/");
+      const res = await api.get("/api/leave/");
       setLeaves(res.data.filter((l) => l.status === "PENDING"));
     } catch (err) {
       console.error("Failed to load leaves", err);
@@ -22,16 +22,14 @@ function LeaveApproval() {
 
   const updateStatus = async (id, action) => {
     try {
-      await api.post(`leave/${id}/${action}/`);
+      await api.post(`/api/leave/${id}/${action}/`);
       loadLeaves();
-    } catch (err) {
+    } catch {
       alert("Action failed");
     }
   };
 
-  if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading...</p>;
-  }
+  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
 
   return (
     <div style={styles.page}>
@@ -91,7 +89,6 @@ function LeaveApproval() {
 
 export default LeaveApproval;
 
-/* styles */
 const styles = {
   page: {
     minHeight: "100vh",
@@ -114,10 +111,7 @@ const styles = {
     marginBottom: 20,
     textAlign: "center",
   },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
+  table: { width: "100%", borderCollapse: "collapse" },
   btn: {
     padding: "8px 14px",
     color: "#fff",
