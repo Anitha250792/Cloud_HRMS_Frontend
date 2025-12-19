@@ -10,7 +10,8 @@ function LeaveList() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("leave/");
+      const res = await api.get("/api/leave/");
+
       setLeaves(res.data);
     } catch (err) {
       console.error(err);

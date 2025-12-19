@@ -3,46 +3,36 @@ import api from "../../api/api";
 
 function MyLeaves() {
   const [leaves, setLeaves] = useState([]);
-  const empCode = localStorage.getItem("emp_code");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const empCode = user?.emp_code;
 
   useEffect(() => {
-    api.get(`leave/my/${empCode}/`).then(res => setLeaves(res.data));
+    if (!empCode) return;
+
+    api.get(`/api/leave/my/${empCode}/`)
+      .then(res => setLeaves(res.data))
+      .catch(console.error);
   }, [empCode]);
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.heading}>🧾 My Leave Requests</h2>
+    <div>
+      <h2>My Leave Requests</h2>
 
-        {leaves.map(l => (
-          <div key={l.id} style={styles.leaveCard}>
-            <div>
-              <b>{l.leave_type}</b>
-              <p>{l.start_date} → {l.end_date}</p>
-            </div>
-            <span style={{
-              ...styles.badge,
-              background:
-                l.status === "APPROVED" ? "#dcfce7" :
-                l.status === "REJECTED" ? "#fee2e2" :
-                "#fef9c3",
-              color:
-                l.status === "APPROVED" ? "#166534" :
-                l.status === "REJECTED" ? "#7f1d1d" :
-                "#854d0e"
-            }}>
-              {l.status}
-            </span>
-          </div>
-        ))}
+      {leaves.map(l => (
+        <div key={l.id}>
+          <b>{l.leave_type}</b>
+          <p>{l.start_date} → {l.end_date}</p>
+          <span>{l.status}</span>
+        </div>
+      ))}
 
-        {leaves.length === 0 && <p>No leave applied</p>}
-      </div>
+      {leaves.length === 0 && <p>No leave applied</p>}
     </div>
   );
 }
 
 export default MyLeaves;
+
 
 const styles = {
   page: { padding: 40, background: "#f8fafc", minHeight: "100vh" },
