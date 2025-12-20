@@ -173,3 +173,5 @@ const errorBox = {
   marginBottom: 16,
   fontWeight: 600,
 };
+
+export default AddEmployee;
