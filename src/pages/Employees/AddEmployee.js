@@ -113,23 +113,24 @@ function AddEmployee() {
 const wrapper = {
   minHeight: "100vh",
   padding: "90px 24px",
-  background: "linear-gradient(135deg,#ecfdf3,#d1fae5)",
+  background: "linear-gradient(135deg,#e0f2fe,#f0f9ff)",
 };
 
 const title = {
   fontSize: 26,
-  fontWeight: 700,
-  color: "#0369a1",
+  fontWeight: 800,
+  color: "#0c4a6e",
   marginBottom: 25,
+  textAlign: "center",
 };
 
 const formBox = {
   maxWidth: 520,
   margin: "0 auto",
-  background: "#fff",
-  padding: 26,
-  borderRadius: 16,
-  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+  background: "#ffffff",
+  padding: 28,
+  borderRadius: 18,
+  boxShadow: "0 15px 35px rgba(2,132,199,0.18)",
 };
 
 const formGroup = { marginBottom: 18 };
@@ -143,29 +144,32 @@ const label = {
 
 const input = {
   width: "100%",
-  padding: 10,
-  borderRadius: 8,
-  border: "1px solid #ccc",
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #bae6fd",
+  background: "#f0f9ff",
+  outline: "none",
+  fontSize: 14,
 };
 
 const button = {
   width: "100%",
-  padding: 12,
-  background: "#0369a1",
-  color: "white",
-  borderRadius: 10,
+  padding: 14,
+  background: "linear-gradient(135deg,#0284c7,#0369a1)",
+  color: "#ffffff",
+  borderRadius: 12,
   fontSize: 16,
+  fontWeight: 700,
   border: "none",
   cursor: "pointer",
+  boxShadow: "0 8px 20px rgba(2,132,199,0.35)",
 };
 
 const errorBox = {
   background: "#fee2e2",
-  color: "#991b1b",
-  padding: 10,
-  borderRadius: 8,
+  color: "#7f1d1d",
+  padding: 12,
+  borderRadius: 10,
   marginBottom: 16,
   fontWeight: 600,
 };
-
-export default AddEmployee;

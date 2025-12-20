@@ -166,17 +166,18 @@ function EmployeeList() {
 export default EmployeeList;
 
 /* ===================== STYLES ===================== */
+/* ===================== STYLES ===================== */
 
 const page = {
   padding: 30,
   minHeight: "100vh",
-  background: "linear-gradient(135deg,#ecfeff,#f0fdf4)",
+  background: "linear-gradient(135deg,#e0f2fe,#f0f9ff)",
 };
 
 const title = {
   fontSize: 30,
   fontWeight: 800,
-  color: "#06144eff",
+  color: "#0c4a6e",
   marginBottom: 25,
 };
 
@@ -188,17 +189,17 @@ const tableWrapper = {
 const table = {
   width: "100%",
   borderCollapse: "collapse",
-  background: "white",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+  background: "#ffffff",
+  boxShadow: "0 12px 35px rgba(2,132,199,0.15)",
 };
 
 const theadRow = {
-  background: "linear-gradient(135deg,#047857,#065f46)",
+  background: "linear-gradient(135deg,#0284c7,#0369a1)",
 };
 
 const th = {
   padding: "14px",
-  color: "white",
+  color: "#ffffff",
   fontWeight: 700,
   fontSize: 14,
 };
@@ -210,12 +211,12 @@ const tr = {
 const td = {
   padding: "12px",
   fontSize: 14,
-  color: "#1f2937",
+  color: "#0f172a",
 };
 
 const deptBadge = {
-  background: "#dbeafe",
-  color: "#1e40af",
+  background: "#e0f2fe",
+  color: "#0369a1",
   padding: "4px 12px",
   borderRadius: 20,
   fontSize: 12,
@@ -223,8 +224,8 @@ const deptBadge = {
 };
 
 const roleBadge = {
-  background: "#fef3c7",
-  color: "#92400e",
+  background: "#dbeafe",
+  color: "#1e40af",
   padding: "4px 12px",
   borderRadius: 20,
   fontSize: 12,
@@ -237,8 +238,8 @@ const actionGroup = {
 };
 
 const editBtn = {
-  background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
-  color: "white",
+  background: "linear-gradient(135deg,#3b82f6,#2563eb)",
+  color: "#ffffff",
   border: "none",
   borderRadius: 8,
   padding: "6px 12px",
@@ -247,8 +248,8 @@ const editBtn = {
 };
 
 const deleteBtn = {
-  background: "linear-gradient(135deg,#dc2626,#b91c1c)",
-  color: "white",
+  background: "linear-gradient(135deg,#ef4444,#dc2626)",
+  color: "#ffffff",
   border: "none",
   borderRadius: 8,
   padding: "6px 12px",
@@ -259,14 +260,16 @@ const deleteBtn = {
 const empty = {
   textAlign: "center",
   padding: 30,
-  color: "#6b7280",
+  color: "#64748b",
   fontWeight: 600,
 };
+
+/* ===== MODAL ===== */
 
 const modalOverlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.5)",
+  background: "rgba(2,132,199,0.25)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -274,11 +277,11 @@ const modalOverlay = {
 };
 
 const modalBox = {
-  background: "#fff",
+  background: "#ffffff",
   padding: 25,
-  borderRadius: 14,
+  borderRadius: 16,
   width: 380,
-  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+  boxShadow: "0 25px 50px rgba(2,132,199,0.35)",
 };
 
 const modalActions = {
@@ -291,8 +294,10 @@ const modalActions = {
 const cancelBtn = {
   padding: "8px 14px",
   borderRadius: 8,
-  border: "1px solid #ccc",
-  background: "#f8fafc",
+  border: "1px solid #bae6fd",
+  background: "#f0f9ff",
+  color: "#0369a1",
+  fontWeight: 600,
   cursor: "pointer",
 };
 
@@ -300,8 +305,9 @@ const confirmBtn = {
   padding: "8px 14px",
   borderRadius: 8,
   border: "none",
-  background: "#dc2626",
-  color: "white",
+  background: "linear-gradient(135deg,#ef4444,#dc2626)",
+  color: "#ffffff",
+  fontWeight: 600,
   cursor: "pointer",
 };
 
