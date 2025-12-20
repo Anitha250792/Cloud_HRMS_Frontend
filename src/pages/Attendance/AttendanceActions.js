@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 
+import { Page } from "../../theme/pageStyles";
+import { Form } from "../../theme/formStyles";
+
+
 function AttendanceActions() {
   const [status, setStatus] = useState("Loading...");
   const [checkInTime, setCheckInTime] = useState(null);
@@ -71,60 +75,6 @@ function AttendanceActions() {
     </div>
   );
 }
-/* ------------------------------ STYLES ------------------------------ */
 
-const page = {
-  minHeight: "100vh",
-  padding: 24,
-  background: "#e0f2fe",
-};
-
-const title = {
-  color: "#0369a1",
-  marginBottom: 20,
-  fontWeight: 700,
-};
-
-const card = {
-  background: "white",
-  padding: 24,
-  borderRadius: 14,
-  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-  maxWidth: 500,
-};
-
-const label = {
-  fontSize: 14,
-  color: "#6b7280",
-};
-
-const value = {
-  fontSize: 28,
-  fontWeight: 700,
-  color: "#0ea5e9",
-};
-
-const info = {
-  marginTop: 8,
-  fontSize: 14,
-  color: "#475569",
-};
-
-const btnRow = {
-  display: "flex",
-  gap: 10,
-  marginTop: 20,
-};
-
-const btn = {
-  flex: 1,
-  padding: "12px 14px",
-  borderRadius: 10,
-  color: "white",
-  fontWeight: 600,
-  border: "none",
-  fontSize: 16,
-  cursor: "pointer",
-};
 
 export default AttendanceActions;

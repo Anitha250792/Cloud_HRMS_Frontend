@@ -4,6 +4,10 @@ import api from "../../api/api";
 import PageLayout from "../../components/PageLayout";
 import { THEME } from "../../theme";
 
+import { Page } from "../../theme/pageStyles";
+import { Form } from "../../theme/formStyles";
+
+
 function AddEmployee() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -69,47 +73,6 @@ function AddEmployee() {
   );
 }
 
-const styles = {
-  card: {
-    maxWidth: 520,
-    margin: "0 auto",
-    background: "#fff",
-    padding: 28,
-    borderRadius: 18,
-    boxShadow: "0 15px 35px rgba(37,99,235,0.25)",
-  },
-  group: { marginBottom: 16 },
-  label: {
-    fontWeight: 600,
-    color: THEME.primaryDark,
-    marginBottom: 6,
-    display: "block",
-  },
-  input: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    border: `1px solid ${THEME.border}`,
-    background: THEME.light,
-  },
-  button: {
-    width: "100%",
-    padding: 14,
-    background: THEME.primary,
-    color: "#fff",
-    borderRadius: 12,
-    fontWeight: 700,
-    border: "none",
-    cursor: "pointer",
-  },
-  error: {
-    background: "#FEE2E2",
-    color: THEME.danger,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 12,
-    fontWeight: 600,
-  },
-};
+
 
 export default AddEmployee;
