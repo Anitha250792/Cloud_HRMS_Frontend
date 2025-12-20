@@ -18,6 +18,10 @@ import EmployeeList from "./pages/Employees/EmployeeList";
 import AddEmployee from "./pages/Employees/AddEmployee";
 import EditEmployee from "./pages/Employees/EditEmployee";
 import EmployeeSalary from "./pages/Employees/EmployeeSalary";
+import EmployeeDetail from "./pages/Employees/EmployeeDetail";
+import EmployeeDirectory from "./pages/Employees/EmployeeDirectory";
+import EmployeeView from "./pages/Employees/EmployeeView";
+
 
 // PAYROLL
 import PayrollList from "./pages/Payroll/PayrollList";
@@ -82,6 +86,11 @@ function AppLayout() {
             <Route path="/employees/add" element={<AddEmployee />} />
             <Route path="/employees/edit/:id" element={<EditEmployee />} />
             <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
+            {/* EXTRA EMPLOYEE PAGES */}
+            <Route path="/employees/directory" element={<EmployeeDirectory />} />
+            <Route path="/employees/view/:id" element={<EmployeeView />} />
+            <Route path="/employees/detail/:id" element={<EmployeeDetail />} />
+
 
             {/* PAYROLL */}
             <Route path="/payroll" element={<PayrollList />} />

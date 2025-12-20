@@ -10,12 +10,14 @@ import {
   FiChevronRight,
   FiDollarSign,
   FiFolder,
+  FiUser,
+  FiShield,
 } from "react-icons/fi";
 
 /* 🎨 COLORS */
 const COLORS = {
-  primary: "#2563EB",
-  highlight: "#BFDBFE",
+  primary: "#2563EB",     // Blue
+  highlight: "#BFDBFE",   // Light blue
   lightBlue: "#EFF6FF",
   border: "#E5E7EB",
   textDark: "#1E3A8A",
@@ -28,14 +30,18 @@ function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [role, setRole] = useState(null);
+  const [username, setUsername] = useState("");
 
-  /* ✅ SAFE ROLE LOAD */
+  /* 🔐 Load user safely */
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
+    const storedName = localStorage.getItem("username");
+
     if (!storedRole) {
       navigate("/login", { replace: true });
     } else {
       setRole(storedRole);
+      setUsername(storedName || "User");
     }
   }, [navigate]);
 
@@ -46,13 +52,13 @@ function Sidebar() {
   const isActive = (path) => location.pathname === path;
   const isGroupActive = (path) => location.pathname.startsWith(path);
 
-  /* ✅ SAFE LOGOUT */
+  /* 🚪 Logout */
   const logout = () => {
     localStorage.clear();
     navigate("/login", { replace: true });
   };
 
-  if (!role) return null; // 🔒 Prevent render flash
+  if (!role) return null;
 
   return (
     <aside style={styles.sidebar(collapsed)}>
@@ -64,6 +70,22 @@ function Sidebar() {
       >
         {collapsed ? "›" : "‹"}
       </button>
+
+      {/* ===== PROFILE / LOGO ===== */}
+      <div style={styles.profileBox}>
+        <div style={styles.logoCircle}>
+          {role === "HR" ? <FiShield size={26} /> : <FiUser size={26} />}
+        </div>
+
+        {!collapsed && (
+          <div>
+            <div style={styles.userName}>{username}</div>
+            <div style={styles.userRole}>
+              {role === "HR" ? "Administrator" : "Employee"}
+            </div>
+          </div>
+        )}
+      </div>
 
       <nav style={{ overflowY: "auto", height: "100%" }}>
         {/* DASHBOARD */}
@@ -102,11 +124,7 @@ function Sidebar() {
               collapsed={collapsed}
             >
               <SubLink to="/attendance" label="Attendance Logs" active={isActive("/attendance")} />
-              <SubLink
-                to="/attendance/working-hours"
-                label="Working Hours"
-                active={isActive("/attendance/working-hours")}
-              />
+              <SubLink to="/attendance/working-hours" label="Working Hours" active={isActive("/attendance/working-hours")} />
             </Dropdown>
 
             <Dropdown
@@ -229,7 +247,7 @@ const styles = {
     position: "fixed",
     top: 0,
     left: 0,
-    paddingTop: 80,
+    paddingTop: 90,
     transition: "0.3s",
     zIndex: 1000,
   }),
@@ -245,6 +263,43 @@ const styles = {
     background: "#fff",
     cursor: "pointer",
     fontWeight: 700,
+  },
+
+  profileBox: {
+    position: "absolute",
+    top: 16,
+    left: 12,
+    right: 12,
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "10px 12px",
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.15)",
+    color: "#fff",
+  },
+
+  logoCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: "50%",
+    background: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: COLORS.primary,
+  },
+
+  userName: {
+    fontSize: 15,
+    fontWeight: 700,
+    color: "#fff",
+  },
+
+  userRole: {
+    fontSize: 12,
+    color: "#BFDBFE",
+    fontWeight: 600,
   },
 
   link: (active) => ({
