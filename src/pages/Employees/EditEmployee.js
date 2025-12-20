@@ -20,19 +20,20 @@ function EditEmployee() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  /* ================= LOAD EMPLOYEE (PRODUCTION SAFE) ================= */
   useEffect(() => {
-    api
-      .get("employees/")
-      .then((res) => {
-        const emp = res.data.find((e) => e.id === Number(id));
-        if (!emp) {
-          setError("Employee not found");
-        } else {
-          setForm(emp);
-        }
-      })
-      .catch(() => setError("Failed to load employee"))
-      .finally(() => setLoading(false));
+    const loadEmployee = async () => {
+      try {
+        const res = await api.get(`/api/employees/${id}/`);
+        setForm(res.data);
+      } catch (err) {
+        setError("❌ Failed to load employee");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEmployee();
   }, [id]);
 
   const handleChange = (e) =>
@@ -44,10 +45,11 @@ function EditEmployee() {
     setError("");
 
     try {
-      await api.put(`employees/update/${id}/`, {
+      await api.put(`/api/employees/update/${id}/`, {
         ...form,
         salary: Number(form.salary),
       });
+
       alert("✅ Employee updated successfully");
       navigate("/employees");
     } catch (err) {
@@ -57,28 +59,29 @@ function EditEmployee() {
     }
   };
 
-  if (loading) return <p style={loadingText}>Loading employee...</p>;
+  if (loading) {
+    return <p style={loadingText}>Loading employee details...</p>;
+  }
 
   return (
     <div style={wrapper}>
       <h2 style={title}>✏️ Edit Employee</h2>
 
       <form style={formBox} onSubmit={handleSubmit}>
-        {error && <p style={errorBox}>{error}</p>}
+        {error && <div style={errorBox}>{error}</div>}
 
-        {Object.keys(form).map((field) => (
-          <div style={formGroup} key={field}>
-            <label style={label}>
-              {field.replace("_", " ").toUpperCase()}
-            </label>
+        {[
+          ["Employee Code", "emp_code"],
+          ["Name", "name"],
+          ["Email", "email"],
+          ["Department", "department"],
+          ["Role", "role"],
+          ["Salary", "salary"],
+        ].map(([labelText, field]) => (
+          <div key={field} style={formGroup}>
+            <label style={label}>{labelText}</label>
             <input
-              type={
-                field === "date_joined"
-                  ? "date"
-                  : field === "salary"
-                  ? "number"
-                  : "text"
-              }
+              type={field === "salary" ? "number" : "text"}
               name={field}
               value={form[field]}
               onChange={handleChange}
@@ -87,6 +90,18 @@ function EditEmployee() {
             />
           </div>
         ))}
+
+        <div style={formGroup}>
+          <label style={label}>Date Joined</label>
+          <input
+            type="date"
+            name="date_joined"
+            value={form.date_joined}
+            onChange={handleChange}
+            style={input}
+            required
+          />
+        </div>
 
         <button style={button} disabled={saving}>
           {saving ? "Saving..." : "Save Changes"}
@@ -98,77 +113,77 @@ function EditEmployee() {
 
 export default EditEmployee;
 
-/* ================= STYLES ================= */
-
-const loadingText = {
-  textAlign: "center",
-  marginTop: 80,
-  fontSize: 18,
-  fontWeight: 600,
-  color: "#065f46",
-};
+/* ===================== STYLES (MATCH SIDEBAR BLUE) ===================== */
 
 const wrapper = {
   minHeight: "100vh",
   padding: "90px 24px",
-  background: "linear-gradient(135deg,#ecfdf3,#d1fae5)",
+  background: "linear-gradient(135deg,#e0f2fe,#f0f9ff)",
 };
 
 const title = {
   fontSize: 26,
   fontWeight: 800,
-  color: "#065f46",
-  marginBottom: 25,
+  color: "#1e3a8a",
+  marginBottom: 24,
   textAlign: "center",
 };
 
 const formBox = {
   maxWidth: 520,
   margin: "0 auto",
-  background: "#fff",
-  padding: 28,
-  borderRadius: 16,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+  background: "#ffffff",
+  padding: 30,
+  borderRadius: 18,
+  boxShadow: "0 15px 35px rgba(37,99,235,0.25)",
 };
 
-const formGroup = {
-  marginBottom: 16,
-};
+const formGroup = { marginBottom: 16 };
 
 const label = {
   display: "block",
   marginBottom: 6,
   fontWeight: 600,
-  color: "#065f46",
-  fontSize: 14,
+  color: "#1e40af",
 };
 
 const input = {
   width: "100%",
-  padding: 10,
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #bfdbfe",
+  background: "#eff6ff",
   fontSize: 14,
+  outline: "none",
 };
 
 const button = {
   width: "100%",
-  padding: 12,
-  background: "#059669",
-  color: "white",
-  borderRadius: 10,
+  padding: 14,
+  background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+  color: "#ffffff",
+  borderRadius: 12,
   fontSize: 16,
+  fontWeight: 700,
   border: "none",
   cursor: "pointer",
-  marginTop: 10,
+  boxShadow: "0 10px 25px rgba(37,99,235,0.45)",
 };
 
 const errorBox = {
   background: "#fee2e2",
-  color: "#991b1b",
-  padding: 10,
-  borderRadius: 8,
+  color: "#7f1d1d",
+  padding: 12,
+  borderRadius: 10,
   marginBottom: 16,
   fontWeight: 600,
   textAlign: "center",
+};
+
+const loadingText = {
+  textAlign: "center",
+  marginTop: 120,
+  fontSize: 18,
+  fontWeight: 600,
+  color: "#1e3a8a",
 };

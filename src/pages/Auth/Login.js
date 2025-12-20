@@ -120,13 +120,7 @@ export default function Login() {
           </button>
         </form>
 
-        {/* GOOGLE LOGIN */}
-        <div style={googleWrap}>
-          <GoogleLogin
-            onSuccess={(res) => handleGoogleLogin(res.credential)}
-            onError={() => setError("Google login failed ❌")}
-          />
-        </div>
+        
 
         <p style={bottom}>
           New here?{" "}
