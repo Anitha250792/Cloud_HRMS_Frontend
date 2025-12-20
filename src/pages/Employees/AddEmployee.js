@@ -62,7 +62,7 @@ function AddEmployee() {
 
   return (
     <div style={wrapper}>
-      <h2 style={title}>➕ Add New Employee</h2>
+      <h2 style={title}> Add New Employee</h2>
 
       <form style={formBox} onSubmit={handleSubmit}>
         {error && <p style={errorBox}>{error}</p>}
@@ -119,7 +119,7 @@ const wrapper = {
 const title = {
   fontSize: 26,
   fontWeight: 700,
-  color: "#065f46",
+  color: "#0369a1",
   marginBottom: 25,
 };
 
@@ -138,7 +138,7 @@ const label = {
   display: "block",
   marginBottom: 6,
   fontWeight: 600,
-  color: "#065f46",
+  color: "#0369a1",
 };
 
 const input = {
@@ -151,7 +151,7 @@ const input = {
 const button = {
   width: "100%",
   padding: 12,
-  background: "#059669",
+  background: "#0369a1",
   color: "white",
   borderRadius: 10,
   fontSize: 16,

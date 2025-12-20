@@ -71,7 +71,7 @@ function EmployeeList() {
                 }}
               >
                 <td style={td}>{e.emp_code}</td>
-                <td style={{ ...td, fontWeight: 600, color: "#065f46" }}>
+                <td style={{ ...td, fontWeight: 600, color: "#0369a1" }}>
                   {e.name}
                 </td>
                 <td style={td}>{e.email}</td>
