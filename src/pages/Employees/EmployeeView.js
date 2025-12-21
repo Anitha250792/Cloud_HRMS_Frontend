@@ -41,47 +41,4 @@ function EmployeeView() {
   );
 }
 
-/* Styles */
-
-const wrapper = {
-  minHeight: "100vh",
-  padding: "90px 24px",
-  background: "linear-gradient(135deg,#ecfdf3,#d1fae5)",
-};
-
-const title = {
-  fontSize: 24,
-  fontWeight: 700,
-  color: "#065f46",
-  marginBottom: 20,
-};
-
-const card = {
-  maxWidth: 500,
-  margin: "0 auto",
-  background: "#fff",
-  padding: 24,
-  borderRadius: 14,
-  fontSize: 16,
-  lineHeight: "1.7",
-  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-};
-
-const editButton = {
-  display: "inline-block",
-  marginTop: 20,
-  padding: "10px 16px",
-  background: "#2563eb",
-  color: "white",
-  borderRadius: 8,
-  textDecoration: "none",
-  fontWeight: 600,
-};
-
-const loading = {
-  paddingTop: 100,
-  textAlign: "center",
-  color: "#444",
-};
-
 export default EmployeeView;

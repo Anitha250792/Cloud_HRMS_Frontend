@@ -62,25 +62,3 @@ function LiveWorkingHours() {
 
 export default LiveWorkingHours;
 
-const styles = {
-  card: {
-    background: "#fff",
-    padding: 24,
-    borderRadius: 16,
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 700,
-    marginBottom: 12,
-  },
-  time: {
-    fontSize: 32,
-    fontWeight: 800,
-    color: "#2563EB",
-  },
-  muted: {
-    color: "#6B7280",
-  },
-};

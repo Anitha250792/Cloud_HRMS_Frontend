@@ -77,48 +77,5 @@ function AttendanceList() {
   );
 }
 
-/* ---------------------- STYLES ---------------------- */
-
-const page = {
-  minHeight: "100vh",
-  background: "linear-gradient(135deg,#0f0c29,#302b63,#24243e)",
-  padding: 30,
-  color: "white",
-};
-
-const card = {
-  background: "rgba(255,255,255,0.07)",
-  padding: 30,
-  borderRadius: 20,
-  border: "1px solid rgba(255,255,255,0.15)",
-  backdropFilter: "blur(20px)",
-  boxShadow: "0 8px 25px rgba(0,0,0,0.6)",
-};
-
-const title = {
-  fontSize: 24,
-  fontWeight: 700,
-  marginBottom: 20,
-};
-
-const table = {
-  width: "100%",
-  borderCollapse: "collapse",
-};
-
-const th = {
-  textAlign: "left",
-  padding: "12px",
-  borderBottom: "1px solid rgba(255,255,255,0.2)",
-};
-
-const td = {
-  padding: "12px",
-  borderBottom: "1px solid rgba(255,255,255,0.1)",
-};
-
-const row = {
-  background: "rgba(255,255,255,0.03)",
-};
 
 export default AttendanceList;
