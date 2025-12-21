@@ -1,232 +1,75 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
 import api from "../../api/api";
 
-export default function Login() {
+function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
-  /* ================= LOGIN ================= */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/login/", {
-        email: formData.email,
-        password: formData.password,
-      });
+      const res = await api.post("/api/auth/login/", formData);
 
-      const { access, refresh, role } = res.data;
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("role", res.data.user.role);
 
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
-      localStorage.setItem("role", role);
-
-      // ✅ ROLE BASED REDIRECT
-      if (role === "HR") {
-        navigate("/admin-dashboard", { replace: true });
-      } else {
-        navigate("/employee-dashboard", { replace: true });
-      }
+      navigate(
+        res.data.user.role === "HR"
+          ? "/admin-dashboard"
+          : "/employee-dashboard",
+        { replace: true }
+      );
     } catch (err) {
       setError(
-        err.response?.data?.error ||
-          err.response?.data?.detail ||
-          "Invalid email or password ❌"
+        err.response?.data?.non_field_errors?.[0] ||
+        "Invalid email or password"
       );
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= GOOGLE LOGIN ================= */
-  const handleGoogleLogin = async (credential) => {
-    try {
-      const res = await api.post("/api/auth/google/", { credential });
-
-      const { access, refresh, role } = res.data;
-
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
-      localStorage.setItem("role", role);
-
-      navigate(
-        role === "HR" ? "/admin-dashboard" : "/employee-dashboard",
-        { replace: true }
-      );
-    } catch {
-      setError("Google login failed ❌");
-    }
-  };
-
   return (
-    <div style={page}>
-      <div style={card}>
-        <div style={icon}>🔒</div>
+    <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <form onSubmit={handleLogin} style={{ width: 380, padding: 30, background: "#fff", borderRadius: 16 }}>
+        <h2>Login</h2>
 
-        <h2 style={title}>Welcome Back</h2>
-        <p style={sub}>Login to access HRMS</p>
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {error && <div style={errorBox}>{error}</div>}
+        <input
+          type="email"
+          placeholder="Email"
+          required
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
 
-        <form onSubmit={handleLogin} style={form}>
-          {/* EMAIL */}
-          <div style={fieldWrapper}>
-            <input
-              type="email"
-              placeholder="Email address"
-              required
-              style={input}
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-          </div>
+        <input
+          type="password"
+          placeholder="Password"
+          required
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+        />
 
-          {/* PASSWORD */}
-          <div style={fieldWrapper}>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              required
-              style={input}
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
-            <span
-              style={eye}
-              onClick={() => setShowPassword(!showPassword)}
-              title="Show / Hide password"
-            >
-              {showPassword ? "🙈" : "👁️"}
-            </span>
-          </div>
+        <button disabled={loading}>
+          {loading ? "Signing in..." : "Login"}
+        </button>
 
-          <button style={btn} disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        
-
-        <p style={bottom}>
-          New here?{" "}
-          <Link to="/register" style={link}>
-            Create account
-          </Link>
+        <p>
+          <Link to="/forgot-password">Forgot password?</Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
 
-/* ================= STYLES ================= */
-
-const page = {
-  minHeight: "100vh",
-  background: "linear-gradient(180deg,#eef2ff,#f8fafc)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const card = {
-  width: 380,
-  background: "#fff",
-  borderRadius: 18,
-  padding: "35px 30px",
-  boxShadow: "0 15px 35px rgba(0,0,0,0.12)",
-  textAlign: "center",
-};
-
-const icon = {
-  width: 55,
-  height: 55,
-  borderRadius: "50%",
-  background: "#2563eb",
-  color: "#fff",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  margin: "0 auto 15px",
-  fontSize: 24,
-};
-
-const title = { fontSize: 22, fontWeight: 700 };
-const sub = { fontSize: 14, color: "#6b7280", marginBottom: 20 };
-
-const form = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 14,
-};
-
-const fieldWrapper = {
-  position: "relative",
-  width: "100%",
-};
-
-const input = {
-  width: "100%",
-  padding: "12px 40px 12px 12px", // SAME WIDTH for email & password
-  borderRadius: 10,
-  border: "1px solid #e5e7eb",
-  fontSize: 14,
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-const eye = {
-  position: "absolute",
-  right: 12,
-  top: "50%",
-  transform: "translateY(-50%)",
-  cursor: "pointer",
-  fontSize: 16,
-};
-
-const btn = {
-  marginTop: 10,
-  padding: 12,
-  background: "#2563eb",
-  color: "#fff",
-  border: "none",
-  borderRadius: 10,
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const googleWrap = {
-  marginTop: 18,
-  display: "flex",
-  justifyContent: "center",
-};
-
-const bottom = { marginTop: 18, fontSize: 14 };
-
-const link = {
-  color: "#2563eb",
-  textDecoration: "none",
-  fontWeight: 500,
-};
-
-const errorBox = {
-  background: "#fee2e2",
-  color: "#b91c1c",
-  padding: 10,
-  borderRadius: 8,
-  marginBottom: 12,
-};
+export default Login;

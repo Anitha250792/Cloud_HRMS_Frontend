@@ -9,9 +9,9 @@ function ForgotPassword() {
 
   const sendOtp = async () => {
     try {
-      await api.post("auth/forgot-password/", { email });
+      await api.post("/api/auth/forgot-password/", { email });
       setMsg("✔ OTP sent to your email");
-    } catch (err) {
+    } catch {
       setMsg("❌ Failed to send OTP");
     }
   };
@@ -20,9 +20,7 @@ function ForgotPassword() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h2 style={styles.title}>Forgot Password?</h2>
-        <p style={styles.subtitle}>
-          Enter your email to receive reset OTP.
-        </p>
+        <p style={styles.subtitle}>Enter your email to receive OTP</p>
 
         {msg && <div style={styles.alert}>{msg}</div>}
 
@@ -31,7 +29,6 @@ function ForgotPassword() {
           <input
             style={styles.input}
             type="email"
-            placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -41,10 +38,8 @@ function ForgotPassword() {
           Send OTP
         </button>
 
-        <p style={styles.text}>
-          <Link to="/login" style={styles.link}>
-            Back to Login
-          </Link>
+        <p style={{ textAlign: "center", marginTop: 10 }}>
+          <Link to="/login">Back to Login</Link>
         </p>
       </div>
     </div>

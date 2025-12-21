@@ -2,58 +2,35 @@ import { useState, useEffect } from "react";
 import api from "../../api/api";
 import { authStyles as styles } from "./authStyles";
 
-
 function VerifyOTP() {
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setEmail(params.get("email"));
+    setEmail(new URLSearchParams(window.location.search).get("email"));
   }, []);
 
-  const verifyOtp = async () => {
+  const verify = async () => {
     try {
-      await api.post("auth/verify-otp/", { email, otp });
-      setMsg("OTP Verified ✔️");
-
-      setTimeout(() => {
-        window.location.href = "/reset-password?email=" + email;
-      }, 1000);
-
-    } catch (err) {
-      setMsg("❌ Invalid OTP");
+      await api.post("/api/auth/verify-otp/", { email, otp });
+      setMsg("OTP verified");
+      window.location.href = "/reset-password?email=" + email;
+    } catch {
+      setMsg("Invalid OTP");
     }
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-
-        <h2 style={styles.title}>Verify OTP</h2>
-        <p style={styles.subtitle}>Enter the OTP sent to your email: {email}</p>
-
+        <h2>Verify OTP</h2>
         {msg && <div style={styles.alert}>{msg}</div>}
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>OTP</label>
-          <input
-            style={styles.input}
-            placeholder="Enter OTP"
-            onChange={(e) => setOtp(e.target.value)}
-          />
-        </div>
-
-        <button style={styles.button} onClick={verifyOtp}>
-          Verify OTP
-        </button>
-
+        <input style={styles.input} onChange={e => setOtp(e.target.value)} />
+        <button style={styles.button} onClick={verify}>Verify</button>
       </div>
     </div>
   );
 }
-
-
 
 export default VerifyOTP;

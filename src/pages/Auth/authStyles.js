@@ -28,14 +28,10 @@ export const authStyles = {
     marginBottom: 20,
   },
   inputGroup: { marginBottom: 14 },
-  label: {
-    fontWeight: 600,
-    fontSize: 13,
-    color: "#064e3b",
-  },
+  label: { fontWeight: 600, fontSize: 13, color: "#064e3b" },
   input: {
     width: "100%",
-    padding: "12px",
+    padding: 12,
     borderRadius: 10,
     marginTop: 5,
     border: "1px solid #9ca3af",
