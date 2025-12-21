@@ -25,22 +25,24 @@ function AddEmployee() {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      await api.post("/api/employees/create/", {
-        ...form,
-        salary: Number(form.salary),
-      });
-      navigate("/employees");
-    } catch {
-      setError("Failed to create employee");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await api.post("employees/create/", {
+      ...form,
+      salary: Number(form.salary),
+    });
+    navigate("/employees");
+  } catch (err) {
+    console.error(err);
+    setError("Failed to create employee");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <PageLayout title="➕ Add Employee">
