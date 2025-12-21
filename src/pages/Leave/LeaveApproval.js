@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
+import { COLORS } from "../../theme/colors";
+
 
 function LeaveApproval() {
   const [leaves, setLeaves] = useState([]);

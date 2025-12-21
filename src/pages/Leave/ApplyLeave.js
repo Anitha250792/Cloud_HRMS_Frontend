@@ -1,5 +1,7 @@
 import { useState } from "react";
 import api from "../../api/api";
+import { COLORS } from "../../theme/colors";
+
 
 function ApplyLeave() {
   const [form, setForm] = useState({
@@ -86,5 +88,66 @@ function ApplyLeave() {
     </div>
   );
 }
+
+const page = {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: COLORS.light,
+};
+
+const card = {
+  background: "#fff",
+  padding: 30,
+  borderRadius: 16,
+  width: 420,
+  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+  border: `1px solid ${COLORS.border}`,
+};
+
+const heading = {
+  textAlign: "center",
+  marginBottom: 20,
+  color: COLORS.primary,
+  fontWeight: 800,
+};
+
+const input = {
+  width: "100%",
+  padding: 12,
+  marginBottom: 14,
+  borderRadius: 10,
+  border: `1px solid ${COLORS.border}`,
+};
+
+const btn = {
+  width: "100%",
+  padding: 14,
+  background: COLORS.primary,
+  color: "#fff",
+  border: "none",
+  borderRadius: 10,
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+const success = {
+  background: COLORS.successBg,
+  color: COLORS.successText,
+  padding: 10,
+  borderRadius: 10,
+  marginBottom: 14,
+  textAlign: "center",
+};
+
+const errorBox = {
+  background: COLORS.errorBg,
+  color: COLORS.errorText,
+  padding: 10,
+  borderRadius: 10,
+  marginBottom: 14,
+  textAlign: "center",
+};
 
 export default ApplyLeave;
