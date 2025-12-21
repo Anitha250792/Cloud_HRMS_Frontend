@@ -35,7 +35,8 @@ function Sidebar() {
   /* 🔐 Load user safely */
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
-    const storedName = localStorage.getItem("username");
+    const storedName = localStorage.setItem("username", res.data.name || res.data.email);
+;
 
     if (!storedRole) {
       navigate("/login", { replace: true });
@@ -58,7 +59,11 @@ function Sidebar() {
     navigate("/login", { replace: true });
   };
 
-  if (!role) return null;
+  if (!role || !["HR", "EMPLOYEE"].includes(role)) {
+  navigate("/login", { replace: true });
+  return null;
+}
+
 
   return (
     <aside style={styles.sidebar(collapsed)}>
