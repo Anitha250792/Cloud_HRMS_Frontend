@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import { authStyles as styles } from "./authStyles";
 
 function Register() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
+
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     role: "EMPLOYEE",
@@ -13,46 +15,110 @@ function Register() {
     password2: "",
   });
 
-  const submit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    if (form.password1 !== form.password2) {
-      setError("Passwords do not match");
+    setError("");
+
+    if (formData.password1 !== formData.password2) {
+      setError("Passwords do not match ❌");
       return;
     }
 
     try {
-      await api.post("auth/register/", form);
+      await api.post("auth/register/", formData);
       navigate("/login");
-    } catch {
-      setError("Registration failed");
+    } catch (err) {
+      setError(
+        err.response?.data?.error ||
+          err.response?.data?.detail ||
+          "Registration failed ❌"
+      );
     }
   };
 
   return (
-    <div style={page}>
-      <div style={card}>
-        <h2>Create Account</h2>
-        {error && <div style={errorBox}>{error}</div>}
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Create Account</h2>
+        <p style={styles.subtitle}>Register to access HRMS</p>
 
-        <form onSubmit={submit}>
-          <input style={input} placeholder="Name"
-            onChange={e=>setForm({...form,name:e.target.value})} />
-          <input style={input} placeholder="Email"
-            onChange={e=>setForm({...form,email:e.target.value})} />
-          <select style={input}
-            onChange={e=>setForm({...form,role:e.target.value})}>
-            <option value="EMPLOYEE">Employee</option>
-            <option value="HR">HR</option>
-          </select>
-          <input style={input} type="password" placeholder="Password"
-            onChange={e=>setForm({...form,password1:e.target.value})} />
-          <input style={input} type="password" placeholder="Confirm Password"
-            onChange={e=>setForm({...form,password2:e.target.value})} />
+        {error && <div style={styles.alert}>{error}</div>}
 
-          <button style={btn}>Register</button>
+        <form onSubmit={handleRegister}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Full Name</label>
+            <input
+              style={styles.input}
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Email</label>
+            <input
+              type="email"
+              style={styles.input}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Role</label>
+            <select
+              style={styles.input}
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
+            >
+              <option value="EMPLOYEE">Employee</option>
+              <option value="HR">HR Admin</option>
+            </select>
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Password</label>
+            <input
+              type="password"
+              style={styles.input}
+              value={formData.password1}
+              onChange={(e) =>
+                setFormData({ ...formData, password1: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Confirm Password</label>
+            <input
+              type="password"
+              style={styles.input}
+              value={formData.password2}
+              onChange={(e) =>
+                setFormData({ ...formData, password2: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <button style={styles.button}>Create Account</button>
         </form>
 
-        <p><Link to="/login">Back to login</Link></p>
+        <p style={{ marginTop: 16, textAlign: "center" }}>
+          Already have an account?{" "}
+          <Link to="/login" style={{ fontWeight: 600, color: "#2563eb" }}>
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );
