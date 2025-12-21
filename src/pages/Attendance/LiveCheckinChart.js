@@ -1,73 +1,36 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { Page } from "../../theme/pageStyles";
-import { Form } from "../../theme/formStyles";
-
 import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid
 } from "recharts";
 
 function LiveCheckinChart() {
   const [data, setData] = useState([]);
 
-  const loadData = async () => {
-    try {
-      const res = await api.get("attendance/realtime/");
-      const raw = res.data;
-
-      const transformed = raw.map((item, index) => ({
-        time: new Date(item.check_in).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        count: index + 1,
-      }));
-
-      setData(transformed);
-    } catch (err) {
-      console.error("Live check-in error:", err);
-    }
-  };
-
   useEffect(() => {
-    loadData(); // first load
-
-    const interval = setInterval(() => {
-      loadData();
-    }, 10000); // refresh every 10 sec
-
-    return () => clearInterval(interval);
+    api.get("attendance/realtime/")
+      .then(res =>
+        setData(res.data.map((r, i) => ({
+          time: new Date(r.check_in).toLocaleTimeString(),
+          count: i + 1
+        })))
+      );
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Real-Time Check-in Activity</h2>
+    <div style={Page.card}>
+      <h3>📈 Live Check-ins</h3>
 
-      {data.length === 0 ? (
-        <p>No check-ins yet today.</p>
-      ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="#007bff"
-              strokeWidth={3}
-              dot={true}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      )}
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="time" />
+          <YAxis />
+          <Tooltip />
+          <Line dataKey="count" stroke="#2563EB" />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }

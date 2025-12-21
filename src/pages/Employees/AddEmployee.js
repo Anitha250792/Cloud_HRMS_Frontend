@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import PageLayout from "../../components/PageLayout";
 
-
 import { Page } from "../../theme/pageStyles";
 import { Form } from "../../theme/formStyles";
-
-
 
 function AddEmployee() {
   const navigate = useNavigate();
@@ -47,33 +44,41 @@ function AddEmployee() {
 
   return (
     <PageLayout title="➕ Add Employee">
-      <form style={styles.card} onSubmit={handleSubmit}>
-        {error && <div style={styles.error}>{error}</div>}
+      <form
+        style={{ ...Page.card, maxWidth: 520, margin: "0 auto" }}
+        onSubmit={handleSubmit}
+      >
+        {error && <div style={Form.error}>{error}</div>}
 
         {Object.keys(form).map((field) => (
-          <div key={field} style={styles.group}>
-            <label style={styles.label}>
+          <div key={field} style={Form.group}>
+            <label style={Form.label}>
               {field.replace("_", " ").toUpperCase()}
             </label>
+
             <input
-              type={field === "salary" ? "number" : field === "date_joined" ? "date" : "text"}
+              type={
+                field === "salary"
+                  ? "number"
+                  : field === "date_joined"
+                  ? "date"
+                  : "text"
+              }
               name={field}
               value={form[field]}
               onChange={handleChange}
-              style={styles.input}
+              style={Form.input}
               required
             />
           </div>
         ))}
 
-        <button style={styles.button} disabled={loading}>
+        <button style={Form.button} disabled={loading}>
           {loading ? "Saving..." : "Save Employee"}
         </button>
       </form>
     </PageLayout>
   );
 }
-
-
 
 export default AddEmployee;
