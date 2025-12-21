@@ -34,17 +34,18 @@ function Sidebar() {
 
   /* 🔐 Load user safely */
   useEffect(() => {
-    const storedRole = localStorage.getItem("role");
-    const storedName = localStorage.setItem("username", res.data.name || res.data.email);
-;
+  const storedRole = localStorage.getItem("role");
+  const storedName = localStorage.getItem("username");
 
-    if (!storedRole) {
-      navigate("/login", { replace: true });
-    } else {
-      setRole(storedRole);
-      setUsername(storedName || "User");
-    }
-  }, [navigate]);
+  if (!storedRole) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  setRole(storedRole);
+  setUsername(storedName || "User");
+}, [navigate]);
+
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
