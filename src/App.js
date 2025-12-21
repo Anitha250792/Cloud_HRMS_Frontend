@@ -1,19 +1,26 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+
 import Sidebar from "./components/Sidebar";
 import RequireAuth from "./components/RequireAuth";
 
-// AUTH
+/* AUTH */
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import VerifyOTP from "./pages/Auth/VerifyOTP";
 import ResetPassword from "./pages/Auth/ResetPassword";
 
-// DASHBOARDS
+/* DASHBOARDS */
 import AdminDashboard from "./pages/AdminDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 
-// EMPLOYEES
+/* EMPLOYEES */
 import EmployeeList from "./pages/Employees/EmployeeList";
 import AddEmployee from "./pages/Employees/AddEmployee";
 import EditEmployee from "./pages/Employees/EditEmployee";
@@ -22,17 +29,16 @@ import EmployeeDetail from "./pages/Employees/EmployeeDetail";
 import EmployeeDirectory from "./pages/Employees/EmployeeDirectory";
 import EmployeeView from "./pages/Employees/EmployeeView";
 
-
-// PAYROLL
+/* PAYROLL */
 import PayrollList from "./pages/Payroll/PayrollList";
 import AddPayroll from "./pages/Payroll/AddPayroll";
 
-// ATTENDANCE
+/* ATTENDANCE */
 import AttendanceActions from "./pages/Attendance/AttendanceActions";
 import AttendanceList from "./pages/Attendance/AttendanceList";
 import HRWorkingHours from "./pages/Attendance/HRWorkingHours";
 
-// LEAVE
+/* LEAVE */
 import LeaveList from "./pages/Leave/LeaveList";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
 import LeaveApproval from "./pages/Leave/LeaveApproval";
@@ -42,8 +48,7 @@ const SIDEBAR_WIDTH = 240;
 function AppLayout() {
   const location = useLocation();
 
-  const hideSidebarRoutes = [
-    "/",
+  const authRoutes = [
     "/login",
     "/register",
     "/forgot-password",
@@ -51,7 +56,7 @@ function AppLayout() {
     "/reset-password",
   ];
 
-  const hideSidebar = hideSidebarRoutes.includes(location.pathname);
+  const hideSidebar = authRoutes.includes(location.pathname);
 
   return (
     <>
@@ -67,17 +72,17 @@ function AppLayout() {
         }}
       >
         <Routes>
-          {/* ================= PUBLIC ROUTES ================= */}
-          <Route path="/" element={<Login />} />
+          {/* ========= PUBLIC ========= */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* ================= PROTECTED ROUTES ================= */}
+          {/* ========= PROTECTED ========= */}
           <Route element={<RequireAuth />}>
-            {/* DASHBOARDS */}
+            {/* DASHBOARD */}
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
 
@@ -86,11 +91,12 @@ function AppLayout() {
             <Route path="/employees/add" element={<AddEmployee />} />
             <Route path="/employees/edit/:id" element={<EditEmployee />} />
             <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
-            {/* EXTRA EMPLOYEE PAGES */}
-            <Route path="/employees/directory" element={<EmployeeDirectory />} />
-            <Route path="/employees/view/:id" element={<EmployeeView />} />
             <Route path="/employees/detail/:id" element={<EmployeeDetail />} />
-
+            <Route path="/employees/view/:id" element={<EmployeeView />} />
+            <Route
+              path="/employees/directory"
+              element={<EmployeeDirectory />}
+            />
 
             {/* PAYROLL */}
             <Route path="/payroll" element={<PayrollList />} />
@@ -98,8 +104,14 @@ function AppLayout() {
 
             {/* ATTENDANCE */}
             <Route path="/attendance" element={<AttendanceList />} />
-            <Route path="/attendance/actions" element={<AttendanceActions />} />
-            <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
+            <Route
+              path="/attendance/actions"
+              element={<AttendanceActions />}
+            />
+            <Route
+              path="/attendance/working-hours"
+              element={<HRWorkingHours />}
+            />
 
             {/* LEAVE */}
             <Route path="/leave" element={<LeaveList />} />
