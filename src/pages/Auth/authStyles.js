@@ -1,57 +1,113 @@
 export const authStyles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7)",
+    background: "linear-gradient(180deg,#eef2ff,#f8fafc)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
+
   card: {
-    width: "100%",
-    maxWidth: 380,
-    backdropFilter: "blur(10px)",
-    background: "rgba(255,255,255,0.25)",
-    padding: 30,
+    width: 380,
+    background: "#fff",
     borderRadius: 18,
-    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+    padding: "35px 30px",
+    boxShadow: "0 15px 35px rgba(0,0,0,0.12)",
   },
+
+  icon: {
+    width: 55,
+    height: 55,
+    borderRadius: "50%",
+    background: "#2563eb",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 15px",
+    fontSize: 24,
+  },
+
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 700,
     textAlign: "center",
-    color: "#064e3b",
   },
+
   subtitle: {
+    fontSize: 14,
+    color: "#6b7280",
     textAlign: "center",
-    color: "#065f46",
     marginBottom: 20,
   },
-  inputGroup: { marginBottom: 14 },
-  label: { fontWeight: 600, fontSize: 13, color: "#064e3b" },
+
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 14,
+  },
+
+  field: {
+    position: "relative",
+  },
+
   input: {
     width: "100%",
-    padding: 12,
+    padding: "12px 40px 12px 12px",
     borderRadius: 10,
-    marginTop: 5,
-    border: "1px solid #9ca3af",
+    border: "1px solid #e5e7eb",
+    fontSize: 14,
+    outline: "none",
+    boxSizing: "border-box",
   },
-  button: {
-    width: "100%",
-    padding: 12,
-    background: "#059669",
-    color: "#fff",
-    borderRadius: 10,
-    fontSize: 16,
+
+  eye: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: "translateY(-50%)",
     cursor: "pointer",
-    fontWeight: 600,
+    fontSize: 16,
   },
-  alert: {
-    background: "rgba(255,255,255,0.4)",
-    padding: 10,
+
+  button: {
+    marginTop: 8,
+    padding: 12,
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
     borderRadius: 10,
-    textAlign: "center",
     fontWeight: 600,
+    cursor: "pointer",
+  },
+
+  alertError: {
+    background: "#fee2e2",
+    color: "#b91c1c",
+    padding: 10,
+    borderRadius: 8,
     marginBottom: 12,
+    textAlign: "center",
+  },
+
+  alertSuccess: {
+    background: "#dcfce7",
+    color: "#166534",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+
+  link: {
+    color: "#2563eb",
+    fontWeight: 600,
+    textDecoration: "none",
+  },
+
+  bottomText: {
+    marginTop: 16,
+    fontSize: 14,
+    textAlign: "center",
   },
 };
