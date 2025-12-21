@@ -17,7 +17,11 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await api.post("auth/login/", form);
+      const res = await api.post("auth/login/", {
+  email: form.email,
+  password: form.password,
+});
+
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
