@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../../api/api";
+import { Page } from "../../theme/pageStyles";
+import { Form } from "../../theme/formStyles";
+
 
 function EmployeeDetail() {
   const { id } = useParams();

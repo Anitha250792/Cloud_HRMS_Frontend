@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
+import { Page } from "../../theme/pageStyles";
+import { Form } from "../../theme/formStyles";
+
 
 function LiveAttendance() {
   const [records, setRecords] = useState([]);

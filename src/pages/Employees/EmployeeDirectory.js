@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { Link } from "react-router-dom";
+import { Page } from "../../theme/pageStyles";
+import { Form } from "../../theme/formStyles";
+
 
 function EmployeeDirectory() {
   const [employees, setEmployees] = useState([]);
