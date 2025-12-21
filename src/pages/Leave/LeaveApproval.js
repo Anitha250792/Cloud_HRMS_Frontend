@@ -58,7 +58,7 @@ function LeaveApproval() {
                 <td>{l.reason}</td>
                 <td>
                   <button
-                    style={{ ...styles.btn, background: "#16a34a" }}
+                    style={{ ...styles.btn, background: COLORS.primary }}
                     onClick={() => updateStatus(l.id, "approve")}
                   >
                     Approve
@@ -115,7 +115,8 @@ const styles = {
   btn: {
     padding: "8px 14px",
     color: "#fff",
-    border: "none",
+    border: `1px solid ${COLORS.border}`,
+
     borderRadius: 8,
     marginRight: 8,
     cursor: "pointer",

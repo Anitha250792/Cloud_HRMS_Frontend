@@ -42,7 +42,7 @@ function LeaveList() {
                   key={l.id}
                   style={{
                     ...styles.tr,
-                    background: index % 2 === 0 ? "#ffffff" : "#f9fafb",
+                    background: "linear-gradient(135deg,#2563EB,#1D4ED8)",
                   }}
                 >
                   <td style={styles.td}>{l.id}</td>
@@ -90,7 +90,7 @@ const styles = {
   page: {
     minHeight: "100vh",
     padding: 40,
-    background: "linear-gradient(135deg,#eef2ff,#f0fdf4)",
+    background: "linear-gradient(135deg,#2563EB,#1D4ED8)",
     display: "flex",
     justifyContent: "center",
   },
@@ -100,7 +100,7 @@ const styles = {
     maxWidth: 1100,
     background: "#ffffff",
     padding: 30,
-    borderRadius: 18,
+    border: `1px solid ${COLORS.border}`,
     boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
   },
 

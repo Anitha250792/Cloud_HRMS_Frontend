@@ -2,9 +2,6 @@ import { useState } from "react";
 import api from "../../api/api";
 
 function ApplyLeave() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const empCode = user?.emp_code;
-
   const [form, setForm] = useState({
     leave_type: "",
     start_date: "",
@@ -22,16 +19,8 @@ function ApplyLeave() {
     setMsg("");
     setError("");
 
-    if (!empCode) {
-      setError("Session expired. Please login again.");
-      return;
-    }
-
     try {
-      await api.post("/api/leave/apply/", {
-        employee: empCode,
-        ...form,
-      });
+      await api.post("leave/apply/", form);
 
       setMsg("✅ Leave applied successfully");
       setForm({
@@ -48,16 +37,10 @@ function ApplyLeave() {
   return (
     <div style={page}>
       <div style={card}>
-        <h2>Apply Leave</h2>
+        <h2 style={heading}>Apply Leave</h2>
 
         {msg && <p style={success}>{msg}</p>}
         {error && <p style={errorBox}>{error}</p>}
-
-        <input
-          value={empCode || ""}
-          disabled
-          style={{ ...input, background: "#f1f5f9" }}
-        />
 
         <select
           name="leave_type"
@@ -93,6 +76,7 @@ function ApplyLeave() {
           value={form.reason}
           onChange={handleChange}
           style={input}
+          placeholder="Reason for leave"
         />
 
         <button onClick={applyLeave} style={btn}>
@@ -104,56 +88,3 @@ function ApplyLeave() {
 }
 
 export default ApplyLeave;
-
-/* ================= STYLES ================= */
-
-const page = {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "#f4f7fc",
-};
-
-const card = {
-  background: "#ffffff",
-  padding: 30,
-  borderRadius: 14,
-  width: 400,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-};
-
-const input = {
-  width: "100%",
-  padding: 10,
-  marginBottom: 12,
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-};
-
-const btn = {
-  width: "100%",
-  padding: 12,
-  background: "#2563eb",
-  color: "#fff",
-  border: "none",
-  borderRadius: 8,
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const success = {
-  background: "#dcfce7",
-  color: "#166534",
-  padding: 10,
-  borderRadius: 8,
-  marginBottom: 12,
-};
-
-const errorBox = {
-  background: "#fee2e2",
-  color: "#7f1d1d",
-  padding: 10,
-  borderRadius: 8,
-  marginBottom: 12,
-};

@@ -7,12 +7,11 @@ function MyLeaves() {
   const empCode = user?.emp_code;
 
   useEffect(() => {
-    if (!empCode) return;
+  api.get("leave/my/")
+    .then(res => setLeaves(res.data))
+    .catch(console.error);
+}, []);
 
-    api.get(`/api/leave/my/${empCode}/`)
-      .then(res => setLeaves(res.data))
-      .catch(console.error);
-  }, [empCode]);
 
   return (
     <div>
@@ -35,12 +34,15 @@ export default MyLeaves;
 
 
 const styles = {
-  page: { padding: 40, background: "#f8fafc", minHeight: "100vh" },
+  page: { padding: 40, background: "linear-gradient(135deg,#2563EB,#1D4ED8)"
+, minHeight: "100vh" },
   card: {
     maxWidth: 800,
     margin: "auto",
     background: "#fff",
     padding: 30,
+    border: `1px solid ${COLORS.border}`,
+
     borderRadius: 16,
     boxShadow: "0 10px 25px rgba(0,0,0,.1)",
   },
