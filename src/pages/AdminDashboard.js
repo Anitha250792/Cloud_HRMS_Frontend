@@ -21,20 +21,22 @@ function AdminDashboard() {
   }, []);
 
   const loadDashboard = async () => {
-    try {
-      const res = await api.get("/api/dashboard/stats/");
-      setStats({
-        totalEmployees: res.data.total_employees ?? 0,
-        presentToday: res.data.present_today ?? 0,
-        onLeave: res.data.on_leave ?? 0,
-        pendingLeaves: res.data.pending_leaves ?? 0,
-      });
-    } catch {
-      setError("Failed to load dashboard");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const res = await api.get("dashboard/stats/");
+    setStats({
+      totalEmployees: res.data.total_employees ?? 0,
+      presentToday: res.data.present_today ?? 0,
+      pendingLeaves: res.data.pending_leaves ?? 0,
+      onLeave: 0,
+    });
+  } catch (err) {
+    console.error(err);
+    setError("Failed to load dashboard");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) return <CenterText>Loading dashboard…</CenterText>;
   if (error) return <CenterText>{error}</CenterText>;
