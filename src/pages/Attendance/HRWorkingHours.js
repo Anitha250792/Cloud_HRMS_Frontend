@@ -6,7 +6,7 @@ function HRWorkingHours() {
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
-    api.get("/api/attendance/records/")
+    api.get("attendance/records/")
       .then(res => setRecords(res.data));
   }, []);
 

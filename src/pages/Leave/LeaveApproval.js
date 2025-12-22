@@ -9,7 +9,7 @@ function LeaveApproval() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("/api/leave/");
+      const res = await api.get("leave/");
       setLeaves(res.data.filter((l) => l.status === "PENDING"));
     } catch (err) {
       console.error("Failed to load leaves", err);
@@ -24,7 +24,7 @@ function LeaveApproval() {
 
   const updateStatus = async (id, action) => {
     try {
-      await api.post(`/api/leave/${id}/${action}/`);
+      await api.post(`leave/${id}/${action}/`);
       loadLeaves();
     } catch {
       alert("Action failed");

@@ -6,7 +6,7 @@ function LiveAttendance() {
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
-    api.get("/attendance/live/")
+    api.get("attendance/live/")
       .then(res => setRecords(res.data));
   }, []);
 

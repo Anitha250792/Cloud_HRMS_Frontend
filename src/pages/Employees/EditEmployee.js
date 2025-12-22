@@ -25,7 +25,7 @@ function EditEmployee() {
   /* ================= LOAD EMPLOYEE ================= */
   useEffect(() => {
     api
-      .get(`employees/${id}/`) // ✅ FIXED PATH
+      .get("employees/${id}/") // ✅ FIXED PATH
       .then((res) => setForm(res.data))
       .catch(() => setError("Failed to load employee"))
       .finally(() => setLoading(false));
@@ -43,7 +43,7 @@ function EditEmployee() {
     setError("");
 
     try {
-      await api.put(`employees/update/${id}/`, {
+      await api.put("employees/update/${id}/", {
         ...form,
         salary: Number(form.salary),
       });

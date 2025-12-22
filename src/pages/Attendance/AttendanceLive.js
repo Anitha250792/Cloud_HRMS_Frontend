@@ -7,7 +7,7 @@ function AttendanceLive() {
 
   useEffect(() => {
     const load = () =>
-      api.get("/api/attendance/realtime/")
+      api.get("attendance/realtime/")
         .then(res => setRecords(res.data));
 
     load();

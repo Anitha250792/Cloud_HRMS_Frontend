@@ -11,7 +11,7 @@ function LiveWorkingHours() {
 
   // Load today's attendance
   useEffect(() => {
-  api.get("/api/attendance/my-today/")
+  api.get("attendance/my-today/")
     .then(res => {
       if (res.data.check_in) {
         const inTime = new Date(res.data.check_in);
