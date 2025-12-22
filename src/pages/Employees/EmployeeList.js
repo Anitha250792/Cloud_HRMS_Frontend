@@ -1,116 +1,162 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import { Page } from "../../theme/pageStyles";
-import { Form } from "../../theme/formStyles";
 
-function EditEmployee() {
-  const { id } = useParams();
+const STATUS_STYLE = {
+  true: { background: "#DCFCE7", color: "#166534" },
+  false: { background: "#FEE2E2", color: "#7F1D1D" },
+};
+
+function EmployeeList() {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    emp_code: "",
-    name: "",
-    email: "",
-    department: "",
-    role: "",
-    salary: "",
-    date_joined: "",
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  useEffect(() => {
+    loadEmployees();
+  }, []);
 
   /* ================= LOAD ================= */
-  useEffect(() => {
-    api
-      .get(`employees/${id}/`)
-      .then((res) => setForm(res.data))
-      .catch(() => setError("Failed to load employee"))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const loadEmployees = async () => {
+    try {
+      // ✅ FIXED URL (NO /api)
+      const res = await api.get("employees/");
+      setEmployees(res.data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load employees");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  /* ================= CHANGE ================= */
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  /* ================= SAVE ================= */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setError("");
+  /* ================= DELETE ================= */
+  const deleteEmployee = async (emp) => {
+    if (!window.confirm(`Deactivate ${emp.name}?`)) return;
 
     try {
-      await api.put(`employees/update/${id}/`, {
-        name: form.name,
-        department: form.department,
-        role: form.role,
-        salary: Number(form.salary),
-      });
-      navigate("/employees");
-    } catch {
-      setError("Failed to update employee");
-    } finally {
-      setSaving(false);
+      // ✅ FIXED URL (NO /api)
+      await api.delete(`employees/delete/${emp.id}/`);
+      loadEmployees();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete employee");
     }
   };
 
   if (loading) {
-    return <p style={styles.center}>Loading employee details…</p>;
+    return <p style={styles.center}>Loading employees…</p>;
+  }
+
+  if (error) {
+    return <p style={{ ...styles.center, color: "red" }}>{error}</p>;
   }
 
   return (
     <div style={Page.wrapper}>
-      <h2 style={Page.title}>✏️ Edit Employee</h2>
+      <h2 style={Page.title}>👥 Employee List</h2>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ ...Page.card, maxWidth: 560, margin: "0 auto" }}
-      >
-        {error && <div style={Form.error}>{error}</div>}
+      <div style={Page.card}>
+        {employees.length === 0 ? (
+          <p style={styles.center}>No employees found</p>
+        ) : (
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Joined On</th>
+                <th style={{ textAlign: "center" }}>Actions</th>
+              </tr>
+            </thead>
 
-        <Field label="Employee Code" value={form.emp_code} disabled />
-        <Field label="Name" name="name" value={form.name} onChange={handleChange} />
-        <Field label="Email" value={form.email} disabled />
-        <Field label="Department" name="department" value={form.department} onChange={handleChange} />
-        <Field label="Role" name="role" value={form.role} onChange={handleChange} />
-        <Field label="Salary" name="salary" type="number" value={form.salary} onChange={handleChange} />
-        <Field label="Date Joined" type="date" value={form.date_joined} disabled />
-
-        <button style={Form.button} disabled={saving}>
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
-      </form>
+            <tbody>
+              {employees.map((emp) => (
+                <tr key={emp.id}>
+                  <td>{emp.emp_code || emp.id}</td>
+                  <td style={{ fontWeight: 600 }}>{emp.name}</td>
+                  <td>{emp.email}</td>
+                  <td>
+                    <span
+                      style={{
+                        ...styles.badge,
+                        ...STATUS_STYLE[emp.is_active],
+                      }}
+                    >
+                      {emp.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td>{emp.date_joined}</td>
+                  <td style={{ textAlign: "center" }}>
+                    <button
+                      style={styles.editBtn}
+                      onClick={() => navigate(`/employees/edit/${emp.id}`)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      style={styles.deleteBtn}
+                      onClick={() => deleteEmployee(emp)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ---------- Reusable Field ---------- */
-const Field = ({ label, name, value, onChange, type = "text", disabled }) => (
-  <div style={Form.group}>
-    <label style={Form.label}>{label}</label>
-    <input
-      name={name}
-      type={type}
-      value={value || ""}
-      onChange={onChange}
-      disabled={disabled}
-      style={{
-        ...Form.input,
-        opacity: disabled ? 0.6 : 1,
-        cursor: disabled ? "not-allowed" : "text",
-      }}
-    />
-  </div>
-);
+export default EmployeeList;
+
+/* ================= STYLES ================= */
 
 const styles = {
   center: {
     textAlign: "center",
-    padding: 30,
+    padding: 20,
     opacity: 0.7,
   },
-};
 
-export default EditEmployee;
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+
+  badge: {
+    padding: "4px 12px",
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 700,
+    display: "inline-block",
+  },
+
+  editBtn: {
+    background: "#2563EB",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: 8,
+    cursor: "pointer",
+    marginRight: 8,
+    fontWeight: 600,
+  },
+
+  deleteBtn: {
+    background: "#DC2626",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: 8,
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+};
