@@ -22,19 +22,18 @@ function EditEmployee() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  /* ================= LOAD EMPLOYEE ================= */
+  /* ================= LOAD ================= */
   useEffect(() => {
     api
-      .get("employees/${id}/") // ✅ FIXED PATH
+      .get(`employees/${id}/`)
       .then((res) => setForm(res.data))
       .catch(() => setError("Failed to load employee"))
       .finally(() => setLoading(false));
   }, [id]);
 
-  /* ================= HANDLE CHANGE ================= */
-  const handleChange = (e) => {
+  /* ================= CHANGE ================= */
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   /* ================= SAVE ================= */
   const handleSubmit = async (e) => {
@@ -43,11 +42,12 @@ function EditEmployee() {
     setError("");
 
     try {
-      await api.put("employees/update/${id}/", {
-        ...form,
+      await api.put(`employees/update/${id}/`, {
+        name: form.name,
+        department: form.department,
+        role: form.role,
         salary: Number(form.salary),
       });
-
       navigate("/employees");
     } catch {
       setError("Failed to update employee");
@@ -70,88 +70,13 @@ function EditEmployee() {
       >
         {error && <div style={Form.error}>{error}</div>}
 
-        {/* EMP CODE */}
-        <div style={Form.group}>
-          <label style={Form.label}>Employee Code</label>
-          <input
-            name="emp_code"
-            value={form.emp_code}
-            onChange={handleChange}
-            style={Form.input}
-            disabled
-          />
-        </div>
-
-        {/* NAME */}
-        <div style={Form.group}>
-          <label style={Form.label}>Name</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            style={Form.input}
-            required
-          />
-        </div>
-
-        {/* EMAIL */}
-        <div style={Form.group}>
-          <label style={Form.label}>Email</label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            style={Form.input}
-            disabled
-          />
-        </div>
-
-        {/* DEPARTMENT */}
-        <div style={Form.group}>
-          <label style={Form.label}>Department</label>
-          <input
-            name="department"
-            value={form.department}
-            onChange={handleChange}
-            style={Form.input}
-          />
-        </div>
-
-        {/* ROLE */}
-        <div style={Form.group}>
-          <label style={Form.label}>Role</label>
-          <input
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            style={Form.input}
-          />
-        </div>
-
-        {/* SALARY */}
-        <div style={Form.group}>
-          <label style={Form.label}>Salary</label>
-          <input
-            name="salary"
-            type="number"
-            value={form.salary}
-            onChange={handleChange}
-            style={Form.input}
-          />
-        </div>
-
-        {/* JOIN DATE */}
-        <div style={Form.group}>
-          <label style={Form.label}>Date Joined</label>
-          <input
-            name="date_joined"
-            type="date"
-            value={form.date_joined}
-            onChange={handleChange}
-            style={Form.input}
-          />
-        </div>
+        <Field label="Employee Code" value={form.emp_code} disabled />
+        <Field label="Name" name="name" value={form.name} onChange={handleChange} />
+        <Field label="Email" value={form.email} disabled />
+        <Field label="Department" name="department" value={form.department} onChange={handleChange} />
+        <Field label="Role" name="role" value={form.role} onChange={handleChange} />
+        <Field label="Salary" name="salary" type="number" value={form.salary} onChange={handleChange} />
+        <Field label="Date Joined" type="date" value={form.date_joined} disabled />
 
         <button style={Form.button} disabled={saving}>
           {saving ? "Saving..." : "Save Changes"}
@@ -161,9 +86,24 @@ function EditEmployee() {
   );
 }
 
-export default EditEmployee;
-
-/* ================= STYLES ================= */
+/* ---------- Reusable Field ---------- */
+const Field = ({ label, name, value, onChange, type = "text", disabled }) => (
+  <div style={Form.group}>
+    <label style={Form.label}>{label}</label>
+    <input
+      name={name}
+      type={type}
+      value={value || ""}
+      onChange={onChange}
+      disabled={disabled}
+      style={{
+        ...Form.input,
+        opacity: disabled ? 0.6 : 1,
+        cursor: disabled ? "not-allowed" : "text",
+      }}
+    />
+  </div>
+);
 
 const styles = {
   center: {
@@ -172,3 +112,5 @@ const styles = {
     opacity: 0.7,
   },
 };
+
+export default EditEmployee;
