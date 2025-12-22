@@ -18,9 +18,11 @@ function EmployeeList() {
     loadEmployees();
   }, []);
 
+  /* ================= LOAD ================= */
   const loadEmployees = async () => {
     try {
-      const res = await api.get("/api/employees/");
+      // ✅ FIXED URL (NO /api)
+      const res = await api.get("employees/");
       setEmployees(res.data);
     } catch (err) {
       console.error(err);
@@ -30,11 +32,13 @@ function EmployeeList() {
     }
   };
 
+  /* ================= DELETE ================= */
   const deleteEmployee = async (emp) => {
     if (!window.confirm(`Deactivate ${emp.name}?`)) return;
 
     try {
-      await api.delete(`/api/employees/delete/${emp.id}/`);
+      // ✅ FIXED URL (NO /api)
+      await api.delete(`employees/delete/${emp.id}/`);
       loadEmployees();
     } catch (err) {
       console.error(err);
@@ -42,11 +46,13 @@ function EmployeeList() {
     }
   };
 
-  if (loading)
+  if (loading) {
     return <p style={styles.center}>Loading employees…</p>;
+  }
 
-  if (error)
+  if (error) {
     return <p style={{ ...styles.center, color: "red" }}>{error}</p>;
+  }
 
   return (
     <div style={Page.wrapper}>
@@ -88,9 +94,7 @@ function EmployeeList() {
                   <td style={{ textAlign: "center" }}>
                     <button
                       style={styles.editBtn}
-                      onClick={() =>
-                        navigate(`/employees/edit/${emp.id}`)
-                      }
+                      onClick={() => navigate(`/employees/edit/${emp.id}`)}
                     >
                       Edit
                     </button>
