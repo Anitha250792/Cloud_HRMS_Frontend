@@ -19,13 +19,13 @@ function EmployeeDashboard() {
 
   const loadEmployeeData = async () => {
   try {
-    const attendanceRes = await api.get("/api/attendance/my-today/");
+    const attendanceRes = await api.get("attendance/my-today/");
     setAttendance(attendanceRes.data);
 
-    const leaveRes = await api.get("/api/leave/my/");
+    const leaveRes = await api.get("leave/my/");
     setLeaveCount(leaveRes.data.length);
 
-    const payrollRes = await api.get("/api/payroll/my/");
+    const payrollRes = await api.get("payroll/my/");
     if (payrollRes.data.length > 0) {
       setPayroll(payrollRes.data[0]);
     }
@@ -38,7 +38,7 @@ function EmployeeDashboard() {
 
 const handleCheckIn = async () => {
   try {
-    const res = await api.post("/api/attendance/check-in/");
+    const res = await api.post("attendance/check-in/");
     setMsg(res.data.message);
     loadEmployeeData();
   } catch (err) {
@@ -48,7 +48,7 @@ const handleCheckIn = async () => {
 
 const handleCheckOut = async () => {
   try {
-    const res = await api.post("/api/attendance/check-out/");
+    const res = await api.post("attendance/check-out/");
     setMsg(res.data.message);
     loadEmployeeData();
   } catch (err) {
