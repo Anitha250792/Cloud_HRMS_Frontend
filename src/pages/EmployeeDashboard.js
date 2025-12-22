@@ -74,6 +74,28 @@ const handleCheckOut = async () => {
 
   return (
     <div style={page}>
+      {/* ===== TOP BAR (EMPLOYEE) ===== */}
+<div style={topBar}>
+  <div style={logoBox}>
+    <div style={logo}>EMS</div>
+    <div>
+      <div style={companyName}>EMS Pro</div>
+      <div style={companySub}>Employee Portal</div>
+    </div>
+  </div>
+
+  <input
+    style={search}
+    placeholder="Search attendance, leaves..."
+    disabled
+  />
+
+  <div style={bellWrapper} onClick={() => navigate("/leave/my")}>
+    🔔
+    {leaveCount > 0 && <span style={badge}>{leaveCount}</span>}
+  </div>
+</div>
+
       <h2 style={title}>👋 Welcome Back</h2>
       <p style={subtitle}>Here’s your overview for today</p>
 
@@ -217,5 +239,56 @@ const loadingBox = {
   textAlign: "center",
   paddingTop: 50,
 };
+
+const topBar = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 24,
+};
+
+const logoBox = { display: "flex", alignItems: "center", gap: 12 };
+
+const logo = {
+  width: 42,
+  height: 42,
+  borderRadius: 12,
+  background: "#2563EB",
+  color: "#fff",
+  fontWeight: 900,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const companyName = { fontWeight: 800 };
+const companySub = { fontSize: 12, color: "#64748B" };
+
+const search = {
+  flex: 1,
+  margin: "0 20px",
+  padding: "10px 14px",
+  borderRadius: 10,
+  border: "1px solid #E5E7EB",
+  background: "#F9FAFB",
+};
+
+const bellWrapper = {
+  position: "relative",
+  fontSize: 22,
+  cursor: "pointer",
+};
+
+const badge = {
+  position: "absolute",
+  top: -6,
+  right: -6,
+  background: "#EF4444",
+  color: "#fff",
+  fontSize: 11,
+  padding: "2px 6px",
+  borderRadius: 999,
+};
+
 
 export default EmployeeDashboard;
