@@ -12,33 +12,39 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      const res = await api.post("auth/login/", {
-  email: form.email,
-  password: form.password,
-});
+  try {
+    const res = await api.post("auth/login/", {
+      email: form.email,
+      password: form.password,
+    });
 
+    // ✅ TOKENS
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-      localStorage.setItem("role", res.data.role);
+    // ✅ ROLE
+    localStorage.setItem("role", res.data.role);
 
-      navigate(
-        res.data.role === "HR"
-          ? "/admin-dashboard"
-          : "/employee-dashboard",
-        { replace: true }
-      );
-    } catch (err) {
-      setError("Invalid email or password ❌");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ USER (THIS WAS MISSING ❗)
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    navigate(
+      res.data.role === "HR"
+        ? "/admin-dashboard"
+        : "/employee-dashboard",
+      { replace: true }
+    );
+  } catch (err) {
+    setError("Invalid email or password ❌");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div style={s.page}>

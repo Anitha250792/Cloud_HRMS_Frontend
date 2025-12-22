@@ -8,24 +8,41 @@ const api = axios.create({
 });
 
 /* ---------- Attach JWT ---------- */
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access");
+
+    // ✅ ACCESS TOKEN EXISTS → attach
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 /* ---------- Auto refresh ---------- */
 api.interceptors.response.use(
-  (res) => res,
+  (response) => response,
   async (error) => {
     const original = error.config;
 
-    if (error.response?.status === 401 && !original._retry) {
+    // 🛑 If no response object, just reject (network / CORS)
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
+    // 🔁 Access expired → refresh
+    if (
+      error.response.status === 401 &&
+      !original._retry &&
+      !original.url.includes("auth/token/refresh")
+    ) {
       original._retry = true;
 
       const refresh = localStorage.getItem("refresh");
+
       if (!refresh) {
         localStorage.clear();
         window.location.href = "/login";
@@ -40,10 +57,12 @@ api.interceptors.response.use(
 
         localStorage.setItem("access", res.data.access);
         original.headers.Authorization = `Bearer ${res.data.access}`;
+
         return api(original);
-      } catch {
+      } catch (err) {
         localStorage.clear();
         window.location.href = "/login";
+        return Promise.reject(err);
       }
     }
 
