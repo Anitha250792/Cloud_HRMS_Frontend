@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
+
 function EmployeeDashboard() {
+  const navigate = useNavigate();
+
   const [attendance, setAttendance] = useState(null);
   const [leaveCount, setLeaveCount] = useState(0);
   const [payroll, setPayroll] = useState(null);
