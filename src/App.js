@@ -41,7 +41,7 @@ import HRWorkingHours from "./pages/Attendance/HRWorkingHours";
 /* LEAVE */
 import LeaveList from "./pages/Leave/LeaveList";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
-import LeaveApproval from "./pages/Leave/LeaveApproval";
+import ApproveLeave from "./pages/Leave/ApproveLeave";
 
 const SIDEBAR_WIDTH = 240;
 
@@ -116,7 +116,7 @@ function AppLayout() {
             {/* LEAVE */}
             <Route path="/leave" element={<LeaveList />} />
             <Route path="/leave/apply" element={<ApplyLeave />} />
-            <Route path="/leave/approve" element={<LeaveApproval />} />
+            <Route path="/leave/approve" element={<ApproveLeave />} />    
           </Route>
         </Routes>
       </main>

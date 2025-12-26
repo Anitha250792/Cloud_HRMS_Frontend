@@ -1,127 +1,134 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
-import { COLORS } from "../../theme/colors";
 
-
-function LeaveApproval() {
+function ApproveLeave() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const loadLeaves = async () => {
-    try {
-      const res = await api.get("leave/");
-      setLeaves(res.data.filter((l) => l.status === "PENDING"));
-    } catch (err) {
-      console.error("Failed to load leaves", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     loadLeaves();
   }, []);
 
-  const updateStatus = async (id, action) => {
+  const loadLeaves = async () => {
     try {
-      await api.post(`leave/${id}/${action}/`);
-      loadLeaves();
-    } catch {
-      alert("Action failed");
+      const res = await api.get("/leave/");
+      setLeaves(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
+  const approveLeave = async (id) => {
+    await api.post(`/leave/${id}/approve/`);
+    loadLeaves();
+  };
+
+  const rejectLeave = async (id) => {
+    await api.post(`/leave/${id}/reject/`);
+    loadLeaves();
+  };
+
+  if (loading) return <p>Loading leaves...</p>;
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.heading}>📝 Pending Leave Approvals</h2>
+    <div style={page}>
+      <h2 style={title}>🛂 Leave Approvals</h2>
 
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Type</th>
-              <th>Dates</th>
-              <th>Reason</th>
-              <th>Action</th>
+      <table style={table}>
+        <thead>
+          <tr>
+            <th>Emp Code</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Dates</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {leaves.map((l) => (
+            <tr key={l.id}>
+              <td>{l.emp_code}</td>
+              <td>{l.employee_name}</td>
+              <td>{l.leave_type}</td>
+              <td>{l.start_date} → {l.end_date}</td>
+              <td>{l.reason}</td>
+              <td>
+                <span style={status(l.status)}>{l.status}</span>
+              </td>
+              <td>
+                {l.status === "PENDING" && (
+                  <>
+                    <button
+                      style={approveBtn}
+                      onClick={() => approveLeave(l.id)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      style={rejectBtn}
+                      onClick={() => rejectLeave(l.id)}
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
+              </td>
             </tr>
-          </thead>
-
-          <tbody>
-            {leaves.map((l) => (
-              <tr key={l.id}>
-                <td>{l.employee_name}</td>
-                <td>{l.leave_type}</td>
-                <td>
-                  {l.start_date} → {l.end_date}
-                </td>
-                <td>{l.reason}</td>
-                <td>
-                  <button
-                    style={{ ...styles.btn, background: COLORS.primary }}
-                    onClick={() => updateStatus(l.id, "approve")}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    style={{ ...styles.btn, background: "#dc2626" }}
-                    onClick={() => updateStatus(l.id, "reject")}
-                  >
-                    Reject
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {leaves.length === 0 && (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center", padding: 20 }}>
-                  No pending leaves 🎉
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
-export default LeaveApproval;
+export default ApproveLeave;
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    padding: 40,
-    background: "#f3f4f6",
-    display: "flex",
-    justifyContent: "center",
-  },
-  card: {
-    width: "100%",
-    maxWidth: 1100,
-    background: "#fff",
-    padding: 30,
-    borderRadius: 16,
-    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-  },
-  heading: {
-    fontSize: 26,
-    fontWeight: 700,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  table: { width: "100%", borderCollapse: "collapse" },
-  btn: {
-    padding: "8px 14px",
-    color: "#fff",
-    border: `1px solid ${COLORS.border}`,
+const page = { padding: 24 };
+const title = { fontSize: 26, fontWeight: 800 };
 
-    borderRadius: 8,
-    marginRight: 8,
-    cursor: "pointer",
-    fontWeight: 600,
-  },
+const table = {
+  width: "100%",
+  borderCollapse: "collapse",
+};
+
+const status = (s) => ({
+  padding: "4px 10px",
+  borderRadius: 8,
+  fontWeight: 700,
+  color:
+    s === "APPROVED"
+      ? "#065F46"
+      : s === "REJECTED"
+      ? "#7F1D1D"
+      : "#92400E",
+  background:
+    s === "APPROVED"
+      ? "#D1FAE5"
+      : s === "REJECTED"
+      ? "#FEE2E2"
+      : "#FEF3C7",
+});
+
+const approveBtn = {
+  background: "#16A34A",
+  color: "#fff",
+  border: "none",
+  padding: "6px 10px",
+  borderRadius: 6,
+  marginRight: 6,
+  cursor: "pointer",
+};
+
+const rejectBtn = {
+  background: "#DC2626",
+  color: "#fff",
+  border: "none",
+  padding: "6px 10px",
+  borderRadius: 6,
+  cursor: "pointer",
 };

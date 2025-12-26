@@ -146,15 +146,20 @@ function Sidebar() {
             </Dropdown>
 
             <Dropdown
-              title="Leaves"
-              icon={<FiCalendar />}
-              open={openMenu === "leaves"}
-              onClick={() => toggleMenu("leaves")}
-              active={isGroupActive("/leave")}
-              collapsed={collapsed}
-            >
-              <SubLink to="/leave/approve" label="Approve Leaves" active={isActive("/leave/approve")} />
-            </Dropdown>
+  title="Leaves"
+  icon={<FiCalendar />}
+  open={openMenu === "leaves"}
+  onClick={() => toggleMenu("leaves")}
+  active={isGroupActive("/leave")}
+  collapsed={collapsed}
+>
+  <SubLink
+    to="/leave/approve"
+    label="Approve Leaves"
+    active={isActive("/leave/approve")}
+  />
+</Dropdown>
+
 
             <Dropdown
               title="Documents"
@@ -185,16 +190,25 @@ function Sidebar() {
             </Dropdown>
 
             <Dropdown
-              title="Leaves"
-              icon={<FiCalendar />}
-              open={openMenu === "leaves"}
-              onClick={() => toggleMenu("leaves")}
-              active={isGroupActive("/leave")}
-              collapsed={collapsed}
-            >
-              <SubLink to="/leave" label="My Leaves" active={isActive("/leave")} />
-              <SubLink to="/leave/apply" label="Apply Leave" active={isActive("/leave/apply")} />
-            </Dropdown>
+  title="Leaves"
+  icon={<FiCalendar />}
+  open={openMenu === "leaves"}
+  onClick={() => toggleMenu("leaves")}
+  active={isGroupActive("/leave")}
+  collapsed={collapsed}
+>
+  <SubLink
+    to="/leave/my"
+    label="My Leaves"
+    active={isActive("/leave/my")}
+  />
+  <SubLink
+    to="/leave/apply"
+    label="Apply Leave"
+    active={isActive("/leave/apply")}
+  />
+</Dropdown>
+
           </>
         )}
 
