@@ -11,7 +11,7 @@ function MyLeaves() {
   useEffect(() => {
   api.get("leave/my/")
     .then(res => setLeaves(res.data))
-    .catch(console.error);
+    .catch(err => console.error("MyLeaves error:", err));
 }, []);
 
 

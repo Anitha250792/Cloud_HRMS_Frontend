@@ -30,7 +30,12 @@ function EmployeeDashboard() {
     setAttendance(attendanceRes.data);
 
     const leaveRes = await api.get("leave/my/");
-    setLeaveCount(leaveRes.data.length);
+
+const pendingCount = leaveRes.data.filter(
+  (l) => l.status === "PENDING"
+).length;
+
+setLeaveCount(pendingCount);
 
     const payrollRes = await api.get("payroll/my/");
     if (payrollRes.data.length > 0) {

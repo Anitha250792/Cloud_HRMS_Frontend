@@ -11,14 +11,14 @@ function LeaveList() {
   }, []);
 
   const loadLeaves = async () => {
-    try {
-      const res = await api.get("leave/");
+  try {
+    const res = await api.get("leave/my/");
+    setLeaves(res.data);
+  } catch (err) {
+    console.error("Leave list error:", err);
+  }
+};
 
-      setLeaves(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   return (
     <div style={styles.page}>
