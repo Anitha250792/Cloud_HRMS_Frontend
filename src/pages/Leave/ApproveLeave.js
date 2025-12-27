@@ -11,8 +11,8 @@ function ApproveLeave() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("/leave/");
-      setLeaves(res.data);
+      const res = await api.get("leave/");
+      setLeaves(res.data.filter(l => l.status === "PENDING"));
     } catch (err) {
       console.error(err);
     } finally {
@@ -21,12 +21,12 @@ function ApproveLeave() {
   };
 
   const approveLeave = async (id) => {
-    await api.post(`/leave/${id}/approve/`);
+    await api.post(`leave/${id}/approve/`);
     loadLeaves();
   };
 
   const rejectLeave = async (id) => {
-    await api.post(`/leave/${id}/reject/`);
+    await api.post(`leave/${id}/reject/`);
     loadLeaves();
   };
 
@@ -44,7 +44,6 @@ function ApproveLeave() {
             <th>Type</th>
             <th>Dates</th>
             <th>Reason</th>
-            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -58,25 +57,12 @@ function ApproveLeave() {
               <td>{l.start_date} → {l.end_date}</td>
               <td>{l.reason}</td>
               <td>
-                <span style={status(l.status)}>{l.status}</span>
-              </td>
-              <td>
-                {l.status === "PENDING" && (
-                  <>
-                    <button
-                      style={approveBtn}
-                      onClick={() => approveLeave(l.id)}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      style={rejectBtn}
-                      onClick={() => rejectLeave(l.id)}
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}
+                <button style={approveBtn} onClick={() => approveLeave(l.id)}>
+                  Approve
+                </button>
+                <button style={rejectBtn} onClick={() => rejectLeave(l.id)}>
+                  Reject
+                </button>
               </td>
             </tr>
           ))}
@@ -87,6 +73,7 @@ function ApproveLeave() {
 }
 
 export default ApproveLeave;
+
 
 const page = { padding: 24 };
 const title = { fontSize: 26, fontWeight: 800 };

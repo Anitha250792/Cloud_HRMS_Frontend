@@ -12,7 +12,6 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access");
 
-    // ✅ ACCESS TOKEN EXISTS → attach
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,12 +27,10 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    // 🛑 If no response object, just reject (network / CORS)
     if (!error.response) {
       return Promise.reject(error);
     }
 
-    // 🔁 Access expired → refresh
     if (
       error.response.status === 401 &&
       !original._retry &&
