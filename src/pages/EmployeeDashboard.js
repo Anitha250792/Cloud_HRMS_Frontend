@@ -2,73 +2,72 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
-
-
-
 function EmployeeDashboard() {
   const navigate = useNavigate();
 
   const [attendance, setAttendance] = useState(null);
-  const [leaveCount, setLeaveCount] = useState(0);
+  const [leaveCount, setLeaveCount] = useState(0);          // 🔔 pending count
+  const [leaveBalance, setLeaveBalance] = useState(0);     // 🧮 balance
   const [payroll, setPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+
   const hasLoaded = useRef(false);
-  
 
-
- useEffect(() => {
-  if (hasLoaded.current) return;
-  hasLoaded.current = true;
-
-  loadEmployeeData();
-}, []);
+  useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+    loadEmployeeData();
+  }, []);
 
   const loadEmployeeData = async () => {
-  try {
-    const attendanceRes = await api.get("attendance/my-today/");
-    setAttendance(attendanceRes.data);
+    try {
+      /* ---------- ATTENDANCE ---------- */
+      const attendanceRes = await api.get("attendance/my-today/");
+      setAttendance(attendanceRes.data);
 
-    const leaveRes = await api.get("leave/my/");
+      /* ---------- LEAVES (PENDING COUNT) ---------- */
+      const leaveRes = await api.get("leave/my/");
+      const pending = leaveRes.data.filter(
+        (l) => l.status === "PENDING"
+      ).length;
+      setLeaveCount(pending);
 
-const pendingCount = leaveRes.data.filter(
-  (l) => l.status === "PENDING"
-).length;
+      /* ---------- LEAVE BALANCE ---------- */
+      const balanceRes = await api.get("leave/balance/");
+      setLeaveBalance(balanceRes.data.balance);
 
-setLeaveCount(pendingCount);
-
-
-    const payrollRes = await api.get("payroll/my/");
-    if (payrollRes.data.length > 0) {
-      setPayroll(payrollRes.data[0]);
+      /* ---------- PAYROLL ---------- */
+      const payrollRes = await api.get("payroll/my/");
+      if (payrollRes.data.length > 0) {
+        setPayroll(payrollRes.data[0]);
+      }
+    } catch (err) {
+      console.error("Employee dashboard error:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Employee dashboard error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const handleCheckIn = async () => {
-  try {
-    const res = await api.post("attendance/check-in/");
-    setMsg(res.data.message);
-    loadEmployeeData();
-  } catch (err) {
-    setMsg(err.response?.data?.error || "Check-in failed");
-  }
-};
+  const handleCheckIn = async () => {
+    try {
+      const res = await api.post("attendance/check-in/");
+      setMsg(res.data.message);
+      loadEmployeeData();
+    } catch (err) {
+      setMsg(err.response?.data?.error || "Check-in failed");
+    }
+  };
 
-const handleCheckOut = async () => {
-  try {
-    const res = await api.post("attendance/check-out/");
-    setMsg(res.data.message);
-    loadEmployeeData();
-  } catch (err) {
-    setMsg(err.response?.data?.error || "Check-out failed");
-  }
-};
-
+  const handleCheckOut = async () => {
+    try {
+      const res = await api.post("attendance/check-out/");
+      setMsg(res.data.message);
+      loadEmployeeData();
+    } catch (err) {
+      setMsg(err.response?.data?.error || "Check-out failed");
+    }
+  };
 
   if (loading) return <div style={loadingBox}>Loading dashboard...</div>;
 
@@ -87,35 +86,36 @@ const handleCheckOut = async () => {
 
   return (
     <div style={page}>
-      {/* ===== TOP BAR (EMPLOYEE) ===== */}
-<div style={topBar}>
-  <div style={logoBox}>
-    <div style={logo}>EMS</div>
-    <div>
-      <div style={companyName}>EMS Pro</div>
-      <div style={companySub}>Employee Portal</div>
-    </div>
-  </div>
+      {/* ===== TOP BAR ===== */}
+      <div style={topBar}>
+        <div style={logoBox}>
+          <div style={logo}>EMS</div>
+          <div>
+            <div style={companyName}>EMS Pro</div>
+            <div style={companySub}>Employee Portal</div>
+          </div>
+        </div>
 
-  <input
-    style={search}
-    placeholder="Search attendance, leaves..."
-    disabled
-  />
+        <input
+          style={search}
+          placeholder="Search attendance, leaves..."
+          disabled
+        />
 
-  <div style={bellWrapper} onClick={() => navigate("/leave/my")}>
-    🔔
-    {leaveCount > 0 && <span style={badge}>{leaveCount}</span>}
-  </div>
-</div>
+        <div style={bellWrapper} onClick={() => navigate("/leave/my")}>
+          🔔
+          {leaveCount > 0 && <span style={badge}>{leaveCount}</span>}
+        </div>
+      </div>
 
       <h2 style={title}>👋 Welcome Back</h2>
       <p style={subtitle}>Here’s your overview for today</p>
 
-      {/* STATUS GRID */}
+      {/* ===== STATUS GRID ===== */}
       <div style={grid}>
         <Card label="Today's Attendance" value={status} color="#10B981" />
-        <Card label="My Leaves" value={leaveCount} color="#3B82F6" />
+        <Card label="Pending Leaves" value={leaveCount} color="#3B82F6" />
+        <Card label="Leave Balance" value={leaveBalance} color="#F59E0B" />
         <Card
           label="Last Salary"
           value={`₹ ${payroll?.net_salary || 0}`}
@@ -128,7 +128,7 @@ const handleCheckOut = async () => {
         />
       </div>
 
-      {/* CHECK IN / OUT */}
+      {/* ===== ATTENDANCE ===== */}
       <div style={attendanceBox}>
         <h3 style={sectionTitle}>🕒 Attendance</h3>
 
@@ -153,7 +153,7 @@ const handleCheckOut = async () => {
         </div>
       </div>
 
-      {/* PAYROLL */}
+      {/* ===== PAYROLL ===== */}
       <div style={salaryBox}>
         <h3 style={sectionTitle}>💰 Latest Payroll</h3>
         {payroll ? (
@@ -169,7 +169,7 @@ const handleCheckOut = async () => {
   );
 }
 
-/* ---------------- UI CARD ---------------- */
+/* ---------- CARD ---------- */
 function Card({ label, value, color }) {
   return (
     <div style={{ ...card, borderLeft: `6px solid ${color}` }}>
@@ -179,7 +179,7 @@ function Card({ label, value, color }) {
   );
 }
 
-/* ---------------- STYLES ---------------- */
+/* ---------- STYLES (UNCHANGED) ---------- */
 
 const page = {
   minHeight: "100vh",
@@ -187,15 +187,8 @@ const page = {
   background: "linear-gradient(135deg,#EEF2FF,#F0F9FF)",
 };
 
-const title = {
-  fontSize: 28,
-  fontWeight: 800,
-};
-
-const subtitle = {
-  color: "#64748B",
-  marginBottom: 20,
-};
+const title = { fontSize: 28, fontWeight: 800 };
+const subtitle = { color: "#64748B", marginBottom: 20 };
 
 const grid = {
   display: "grid",
@@ -203,33 +196,12 @@ const grid = {
   gap: 18,
 };
 
-const card = {
-  background: "#fff",
-  padding: 20,
-  borderRadius: 14,
-};
+const card = { background: "#fff", padding: 20, borderRadius: 14 };
+const labelStyle = { fontSize: 16, color: "#475569" };
+const valueStyle = { fontSize: 26, fontWeight: 700 };
 
-const labelStyle = {
-  fontSize: 16,
-  color: "#475569",
-};
-
-const valueStyle = {
-  fontSize: 26,
-  fontWeight: 700,
-};
-
-const attendanceBox = {
-  marginTop: 30,
-  padding: 20,
-  background: "#fff",
-  borderRadius: 16,
-};
-
-const sectionTitle = {
-  fontSize: 20,
-  fontWeight: 700,
-};
+const attendanceBox = { marginTop: 30, padding: 20, background: "#fff", borderRadius: 16 };
+const sectionTitle = { fontSize: 20, fontWeight: 700 };
 
 const btn = {
   padding: "10px 20px",
@@ -240,68 +212,17 @@ const btn = {
   cursor: "pointer",
 };
 
-const salaryBox = {
-  marginTop: 30,
-  padding: 20,
-  background: "#fff",
-  borderRadius: 16,
-};
+const salaryBox = { marginTop: 30, padding: 20, background: "#fff", borderRadius: 16 };
+const loadingBox = { fontSize: 20, textAlign: "center", paddingTop: 50 };
 
-const loadingBox = {
-  fontSize: 20,
-  textAlign: "center",
-  paddingTop: 50,
-};
-
-const topBar = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: 24,
-};
-
+const topBar = { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 };
 const logoBox = { display: "flex", alignItems: "center", gap: 12 };
-
-const logo = {
-  width: 42,
-  height: 42,
-  borderRadius: 12,
-  background: "#2563EB",
-  color: "#fff",
-  fontWeight: 900,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
+const logo = { width: 42, height: 42, borderRadius: 12, background: "#2563EB", color: "#fff", fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" };
 const companyName = { fontWeight: 800 };
 const companySub = { fontSize: 12, color: "#64748B" };
 
-const search = {
-  flex: 1,
-  margin: "0 20px",
-  padding: "10px 14px",
-  borderRadius: 10,
-  border: "1px solid #E5E7EB",
-  background: "#F9FAFB",
-};
-
-const bellWrapper = {
-  position: "relative",
-  fontSize: 22,
-  cursor: "pointer",
-};
-
-const badge = {
-  position: "absolute",
-  top: -6,
-  right: -6,
-  background: "#EF4444",
-  color: "#fff",
-  fontSize: 11,
-  padding: "2px 6px",
-  borderRadius: 999,
-};
-
+const search = { flex: 1, margin: "0 20px", padding: "10px 14px", borderRadius: 10, border: "1px solid #E5E7EB", background: "#F9FAFB" };
+const bellWrapper = { position: "relative", fontSize: 22, cursor: "pointer" };
+const badge = { position: "absolute", top: -6, right: -6, background: "#EF4444", color: "#fff", fontSize: 11, padding: "2px 6px", borderRadius: 999 };
 
 export default EmployeeDashboard;
