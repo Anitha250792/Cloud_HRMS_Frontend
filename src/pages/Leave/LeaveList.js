@@ -7,8 +7,11 @@ function LeaveList() {
   const [leaves, setLeaves] = useState([]);
 
   useEffect(() => {
-    loadLeaves();
-  }, []);
+  api.get("leave/my/")
+    .then(res => setLeaves(res.data))
+    .catch(err => console.error("MyLeaves error:", err));
+}, []);
+
 
   const loadLeaves = async () => {
   try {

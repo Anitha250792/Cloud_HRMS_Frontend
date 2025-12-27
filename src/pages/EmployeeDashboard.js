@@ -37,6 +37,7 @@ const pendingCount = leaveRes.data.filter(
 
 setLeaveCount(pendingCount);
 
+
     const payrollRes = await api.get("payroll/my/");
     if (payrollRes.data.length > 0) {
       setPayroll(payrollRes.data[0]);
