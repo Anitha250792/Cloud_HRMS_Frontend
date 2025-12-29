@@ -55,6 +55,7 @@ function EmployeeDashboard() {
 
 
   const handleCheckIn = async () => {
+    if (attendance?.check_in) return;
     try {
       const res = await api.post("attendance/check-in/");
       setMsg(res.data.message);
@@ -65,6 +66,7 @@ function EmployeeDashboard() {
   };
 
   const handleCheckOut = async () => {
+    if (!attendance?.check_in || attendance?.check_out) return;
     try {
       const res = await api.post("attendance/check-out/");
       setMsg(res.data.message);
