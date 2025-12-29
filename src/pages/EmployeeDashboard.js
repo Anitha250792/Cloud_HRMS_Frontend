@@ -103,6 +103,7 @@ function EmployeeDashboard() {
         />
 
         <div style={bellWrapper} onClick={() => navigate("/leave/my")}>
+
           🔔
           {leaveCount > 0 && <span style={badge}>{leaveCount}</span>}
         </div>
