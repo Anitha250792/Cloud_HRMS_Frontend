@@ -21,33 +21,38 @@ function EmployeeDashboard() {
   }, []);
 
   const loadEmployeeData = async () => {
-    try {
-      /* ---------- ATTENDANCE ---------- */
-      const attendanceRes = await api.get("attendance/my-today/");
-      setAttendance(attendanceRes.data);
+  try {
+    const [
+      attendanceRes,
+      leaveRes,
+      balanceRes,
+      payrollRes
+    ] = await Promise.all([
+      api.get("attendance/my-today/"),
+      api.get("leave/my/"),
+      api.get("leave/balance/"),
+      api.get("payroll/my/")
+    ]);
 
-      /* ---------- LEAVES (PENDING COUNT) ---------- */
-      const leaveRes = await api.get("leave/my/");
-      const pending = leaveRes.data.filter(
-        (l) => l.status === "PENDING"
-      ).length;
-      setLeaveCount(pending);
+    setAttendance(attendanceRes.data);
 
-      /* ---------- LEAVE BALANCE ---------- */
-      const balanceRes = await api.get("leave/balance/");
-      setLeaveBalance(balanceRes.data.balance);
+    const pending = leaveRes.data.filter(
+      (l) => l.status === "PENDING"
+    ).length;
+    setLeaveCount(pending);
 
-      /* ---------- PAYROLL ---------- */
-      const payrollRes = await api.get("payroll/my/");
-      if (payrollRes.data.length > 0) {
-        setPayroll(payrollRes.data[0]);
-      }
-    } catch (err) {
-      console.error("Employee dashboard error:", err);
-    } finally {
-      setLoading(false);
+    setLeaveBalance(balanceRes.data.balance);
+
+    if (payrollRes.data.length > 0) {
+      setPayroll(payrollRes.data[0]);
     }
-  };
+  } catch (err) {
+    console.error("Employee dashboard error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleCheckIn = async () => {
     try {
