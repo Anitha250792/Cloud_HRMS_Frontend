@@ -116,7 +116,7 @@ function AppLayout() {
             />
 
             {/* LEAVE */}
-            <Route path="/leave" element={<LeaveList />} />
+            <Route path="/leave/my" element={<LeaveList />} />
             <Route path="/leave/my" element={<MyLeaves />} />   
             <Route path="/leave/apply" element={<ApplyLeave />} />
             <Route path="/leave/approve" element={<ApproveLeave />} />    
