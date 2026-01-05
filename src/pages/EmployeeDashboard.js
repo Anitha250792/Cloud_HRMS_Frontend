@@ -41,7 +41,7 @@ function EmployeeDashboard() {
     ).length;
     setLeaveCount(pending);
 
-    setLeaveBalance(balanceRes.data.balance);
+    setLeaveBalance(balanceRes.data.balance.PAID);
 
     if (payrollRes.data.length > 0) {
       setPayroll(payrollRes.data[0]);
