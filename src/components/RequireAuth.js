@@ -3,33 +3,27 @@ import { useEffect, useState } from "react";
 
 export default function RequireAuth() {
   const location = useLocation();
-  const [isReady, setIsReady] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
     const access = localStorage.getItem("access");
     const role = localStorage.getItem("role");
 
     if (access && role) {
-      setIsAuth(true);
+      setAllowed(true);
     }
 
-    setIsReady(true);
+    setChecked(true);
   }, []);
 
-  // ⏳ Wait until router + auth check is ready
-  if (!isReady) {
-    return null; // or loading spinner
+  if (!checked) {
+    // 🔥 IMPORTANT: do nothing until auth check completes
+    return null;
   }
 
-  if (!isAuth) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-        state={{ from: location.pathname }}
-      />
-    );
+  if (!allowed) {
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;
