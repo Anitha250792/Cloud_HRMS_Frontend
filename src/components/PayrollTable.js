@@ -5,13 +5,13 @@ const PayrollTable = () => {
   const [payrolls, setPayrolls] = useState([]);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/payroll/")
+    axios.get("https://cloud-hrms-1.onrender.com/api/payroll/")
       .then(res => setPayrolls(res.data))
       .catch(err => console.log(err));
   }, []);
 
   const downloadPayslip = (id) => {
-    window.open(`http://127.0.0.1:8000/api/payroll/${id}/download/`, "_blank");
+    window.open(`https://cloud-hrms-1.onrender.com/api/payroll/${id}/download/`, "_blank");
   };
 
   return (
