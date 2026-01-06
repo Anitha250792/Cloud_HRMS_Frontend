@@ -39,11 +39,9 @@ import AttendanceList from "./pages/Attendance/AttendanceList";
 import HRWorkingHours from "./pages/Attendance/HRWorkingHours";
 
 /* LEAVE */
-import LeaveList from "./pages/Leave/LeaveList";
+import MyLeaves from "./pages/Leave/MyLeaves";
 import ApplyLeave from "./pages/Leave/ApplyLeave";
 import ApproveLeave from "./pages/Leave/ApproveLeave";
-import MyLeaves from "./pages/Leave/MyLeaves";
-
 
 const SIDEBAR_WIDTH = 240;
 
@@ -84,7 +82,7 @@ function AppLayout() {
 
           {/* ========= PROTECTED ========= */}
           <Route element={<RequireAuth />}>
-            {/* DASHBOARD */}
+            {/* DASHBOARDS */}
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
 
@@ -116,11 +114,13 @@ function AppLayout() {
             />
 
             {/* LEAVE */}
-            <Route path="/leave/my" element={<LeaveList />} />
-            <Route path="/leave/my" element={<MyLeaves />} />   
+            <Route path="/leave/my" element={<MyLeaves />} />
             <Route path="/leave/apply" element={<ApplyLeave />} />
-            <Route path="/leave/approve" element={<ApproveLeave />} />    
+            <Route path="/leave/approve" element={<ApproveLeave />} />
           </Route>
+
+          {/* ========= CATCH-ALL (VERY IMPORTANT) ========= */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
     </>
