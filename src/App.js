@@ -1,5 +1,5 @@
 import {
-  HashRouter as Router,
+  HashRouter as Router,   // 🔥 IMPORTANT
   Routes,
   Route,
   useLocation,
