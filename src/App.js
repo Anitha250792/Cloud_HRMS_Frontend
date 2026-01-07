@@ -7,6 +7,8 @@ import {
 
 import Sidebar from "./components/Sidebar";
 import RequireAuth from "./components/RequireAuth";
+import ErrorBoundary from "./components/ErrorBoundary";
+
 
 /* AUTH */
 import Login from "./pages/Auth/Login";
