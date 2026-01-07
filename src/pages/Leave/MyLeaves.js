@@ -15,13 +15,13 @@ function MyLeaves() {
       setLeaves(res.data || []);
     } catch (err) {
       console.error("Leave API failed", err);
-      setLeaves([]); // prevent crash
+      setLeaves([]);   // 👈 critical
+      setError("Unable to load leave data");
     }
   };
 
   loadLeaves();
 }, []);
-
 
   return (
     <div>

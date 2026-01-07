@@ -1,5 +1,8 @@
 import axios from "axios";
 
+/* -------------------------------------------------
+   AXIOS INSTANCE
+-------------------------------------------------- */
 const api = axios.create({
   baseURL: "https://cloud-hrms-1.onrender.com/api/",
   timeout: 15000,
@@ -8,14 +11,15 @@ const api = axios.create({
   },
 });
 
-
-/* ---------- Attach JWT ---------- */
+/* -------------------------------------------------
+   REQUEST INTERCEPTOR (Attach JWT)
+-------------------------------------------------- */
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access");
+    const access = localStorage.getItem("access");
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (access) {
+      config.headers.Authorization = `Bearer ${access}`;
     }
 
     return config;
@@ -23,28 +27,33 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/* ---------- Auto refresh ---------- */
+/* -------------------------------------------------
+   RESPONSE INTERCEPTOR (Auto Refresh Token)
+-------------------------------------------------- */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const original = error.config;
-
+    // Network / server down
     if (!error.response) {
+      console.error("Network error", error);
       return Promise.reject(error);
     }
 
+    const originalRequest = error.config;
+
+    // Only handle 401
     if (
       error.response.status === 401 &&
-      !original._retry &&
-      !original.url.includes("auth/token/refresh")
+      !originalRequest._retry &&
+      !originalRequest.url.includes("auth/token/refresh")
     ) {
-      original._retry = true;
+      originalRequest._retry = true;
 
       const refresh = localStorage.getItem("refresh");
 
+      // No refresh token → force logout
       if (!refresh) {
-        localStorage.clear();
-        window.location.href = "/login";
+        logout();
         return Promise.reject(error);
       }
 
@@ -54,19 +63,32 @@ api.interceptors.response.use(
           { refresh }
         );
 
+        // Save new access token
         localStorage.setItem("access", res.data.access);
-        original.headers.Authorization = `Bearer ${res.data.access}`;
 
-        return api(original);
-      } catch (err) {
-        localStorage.clear();
-        window.location.href = "/login";
-        return Promise.reject(err);
+        // Retry original request
+        originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+        return api(originalRequest);
+
+      } catch (refreshError) {
+        logout();
+        return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
   }
 );
+
+/* -------------------------------------------------
+   SAFE LOGOUT (NO BLANK PAGE)
+-------------------------------------------------- */
+function logout() {
+  localStorage.clear();
+
+  if (window.location.pathname !== "/login") {
+    window.location.replace("/login");
+  }
+}
 
 export default api;
