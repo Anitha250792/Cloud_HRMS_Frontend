@@ -9,9 +9,17 @@ function MyLeaves() {
   const empCode = user?.emp_code;
 
   useEffect(() => {
-  api.get("leave/my/")
-    .then(res => setLeaves(res.data))
-    .catch(err => console.error("MyLeaves error:", err));
+  const loadLeaves = async () => {
+    try {
+      const res = await api.get("leave/my/");
+      setLeaves(res.data || []);
+    } catch (err) {
+      console.error("Leave API failed", err);
+      setLeaves([]); // prevent crash
+    }
+  };
+
+  loadLeaves();
 }, []);
 
 
