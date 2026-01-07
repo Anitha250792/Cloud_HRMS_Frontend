@@ -22,7 +22,7 @@ function EmployeePayslipHistory() {
   };
 
   const downloadPDF = (payrollId) => {
-    window.open(`http://127.0.0.1:8000/api/payroll/download/${payrollId}/`, "_blank");
+    window.open(`https://cloud-hrms-1.onrender.com/api/payroll/download/${payrollId}/`, "_blank");
   };
 
   const sendEmail = async (payrollId) => {

@@ -1,5 +1,4 @@
 import {
-  HashRouter as Router,   // 🔥 IMPORTANT
   Routes,
   Route,
   useLocation,
@@ -112,10 +111,4 @@ function AppLayout() {
   );
 }
 
-export default function App() {
-  return (
-    <Router>
-      <AppLayout />
-    </Router>
-  );
-}
+export default AppLayout;

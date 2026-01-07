@@ -16,7 +16,7 @@ export default function SalaryChart() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/payroll/chart/")
+      .get("https://cloud-hrms-1.onrender.com/api/payroll/chart/")
       .then((res) => setChartData(res.data))
       .catch((err) => console.log(err));
   }, []);
