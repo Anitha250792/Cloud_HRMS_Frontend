@@ -100,15 +100,7 @@ function AppLayout() {
             <Route path="/attendance/actions" element={<AttendanceActions />} />
             <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
 
-            <Route
-  path="/leave/my"
-  element={
-    <ErrorBoundary>
-      <MyLeaves />
-    </ErrorBoundary>
-  }
-/>
-
+            <Route path="/leave/my" element={<MyLeaves />} />
             <Route path="/leave/apply" element={<ApplyLeave />} />
             <Route path="/leave/approve" element={<ApproveLeave />} />
           </Route>
