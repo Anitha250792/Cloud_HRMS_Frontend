@@ -5,20 +5,28 @@ import { Page } from "../../theme/pageStyles";
 function AttendanceList() {
   const [record, setRecord] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadAttendance = async () => {
-      try {
-        const res = await api.get("attendance/my-today/");
-        setRecord(res.data);
-        setError("");
-      } catch (err) {
-        console.error("Attendance fetch failed", err);
-        setError("Unable to load attendance");
-      }
-    };
+    let mounted = true;
 
-    loadAttendance();
+    api.get("attendance/my-today/")
+      .then(res => {
+        if (!mounted) return;
+        setRecord(res.data || null);
+        setError("");
+      })
+      .catch(err => {
+        if (!mounted) return;
+        console.error("Attendance fetch failed", err);
+        setError("Attendance service unavailable");
+        setRecord(null);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => { mounted = false; };
   }, []);
 
   return (
@@ -26,16 +34,22 @@ function AttendanceList() {
       <h2 style={Page.title}>📋 Attendance</h2>
 
       <div style={Page.card}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <p>Loading attendance…</p>}
 
-        {!error && !record && <p>No attendance marked today</p>}
+        {!loading && error && (
+          <p style={{ color: "red" }}>{error}</p>
+        )}
 
-        {record && (
+        {!loading && !error && !record && (
+          <p>No attendance marked today</p>
+        )}
+
+        {!loading && record && (
           <>
-            <p>Status: <b>{record.status}</b></p>
+            <p>Status: <b>{record.status || "—"}</b></p>
             <p>Check-in: {record.check_in || "—"}</p>
             <p>Check-out: {record.check_out || "—"}</p>
-            <p>Working Hours: {record.working_hours || "0"}</p>
+            <p>Working Hours: {record.working_hours ?? 0}</p>
           </>
         )}
       </div>
