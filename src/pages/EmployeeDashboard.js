@@ -36,18 +36,29 @@ function EmployeeDashboard() {
 
     setAttendance(attendanceRes.data);
 
-    const pending = leaveRes.data.filter(
-      (l) => l.status === "PENDING"
-    ).length;
+    const pending = Array.isArray(leaveRes.data)
+      ? leaveRes.data.filter(l => l.status === "PENDING").length
+      : 0;
     setLeaveCount(pending);
 
-    setLeaveBalance(balanceRes.data.balance.PAID);
+    // ✅ SAFE access
+    setLeaveBalance(
+      balanceRes?.data?.balance?.PAID ?? 0
+    );
 
-    if (payrollRes.data.length > 0) {
+    if (Array.isArray(payrollRes.data) && payrollRes.data.length > 0) {
       setPayroll(payrollRes.data[0]);
     }
+
   } catch (err) {
     console.error("Employee dashboard error:", err);
+
+    // ✅ PREVENT BLANK PAGE
+    setAttendance(null);
+    setLeaveCount(0);
+    setLeaveBalance(0);
+    setPayroll(null);
+
   } finally {
     setLoading(false);
   }
