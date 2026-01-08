@@ -4,9 +4,10 @@ import { COLORS } from "../../theme/colors";
 
 function MyLeaves() {
   const [leaves, setLeaves] = useState([]);
-  const [error, setError] = useState(""); // ✅ REQUIRED
+  const [error, setError] = useState("");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // ✅ SAFE JSON PARSE (CRITICAL)
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
     const loadLeaves = async () => {
@@ -16,7 +17,7 @@ function MyLeaves() {
         setError("");
       } catch (err) {
         console.error("Leave API failed", err);
-        setLeaves([]);          // 👈 prevents crash
+        setLeaves([]);                // prevents crash
         setError("Unable to load leave data");
       }
     };
@@ -29,7 +30,7 @@ function MyLeaves() {
       <div style={styles.card}>
         <h2 style={styles.heading}>My Leave Requests</h2>
 
-        {/* ERROR MESSAGE */}
+        {/* ERROR */}
         {error && (
           <p style={{ color: "red", textAlign: "center" }}>
             {error}
@@ -41,7 +42,7 @@ function MyLeaves() {
           <p style={{ textAlign: "center" }}>No leave applied</p>
         )}
 
-        {/* LEAVE LIST */}
+        {/* LIST */}
         {leaves.map((l) => (
           <div key={l.id} style={styles.leaveCard}>
             <div>
@@ -79,9 +80,7 @@ function MyLeaves() {
 
 export default MyLeaves;
 
-/* -------------------------------------------------
-   STYLES
--------------------------------------------------- */
+/* ---------------- STYLES ---------------- */
 const styles = {
   page: {
     padding: 40,

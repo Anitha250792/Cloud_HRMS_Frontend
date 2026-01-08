@@ -3,24 +3,41 @@ import api from "../../api/api";
 import { Page } from "../../theme/pageStyles";
 
 function AttendanceList() {
-  const [records, setRecords] = useState([]);
+  const [record, setRecord] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("attendance/records/")
-      .then(res => setRecords(res.data))
-      .catch(console.error);
+    const loadAttendance = async () => {
+      try {
+        const res = await api.get("attendance/my-today/");
+        setRecord(res.data);
+        setError("");
+      } catch (err) {
+        console.error("Attendance fetch failed", err);
+        setError("Unable to load attendance");
+      }
+    };
+
+    loadAttendance();
   }, []);
 
   return (
     <div style={Page.wrapper}>
-      <h2 style={Page.title}>📋 Attendance Records</h2>
+      <h2 style={Page.title}>📋 Attendance</h2>
 
       <div style={Page.card}>
-        {records.map(r => (
-          <p key={r.id}>
-            {r.employee} — {r.status} — {r.hours_worked ?? "—"}
-          </p>
-        ))}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {!error && !record && <p>No attendance marked today</p>}
+
+        {record && (
+          <>
+            <p>Status: <b>{record.status}</b></p>
+            <p>Check-in: {record.check_in || "—"}</p>
+            <p>Check-out: {record.check_out || "—"}</p>
+            <p>Working Hours: {record.working_hours || "0"}</p>
+          </>
+        )}
       </div>
     </div>
   );
