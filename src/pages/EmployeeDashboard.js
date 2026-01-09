@@ -31,10 +31,14 @@ function EmployeeDashboard() {
       api.get("attendance/my-today/"),
       api.get("leave/my/"),
       api.get("leave/balance/"),
-      api.get("payroll/my/")
+      api.get("payroll/my/"),
+      api.get("attendance/summary/")
+
     ]);
 
     setAttendance(attendanceRes.data);
+    setWorkingDays(summaryRes.data.worked_days ?? 0);
+
 
     const pending = Array.isArray(leaveRes.data)
       ? leaveRes.data.filter(l => l.status === "PENDING").length
@@ -89,8 +93,9 @@ function EmployeeDashboard() {
 
   if (loading) return <div style={loadingBox}>Loading dashboard...</div>;
 
-  const checkedIn = attendance?.check_in;
-  const checkedOut = attendance?.check_out;
+  const checkedIn = attendance?.is_checked_in === true;
+  const checkedOut = attendance?.check_out !== null;
+
 
   const status =
     attendance?.status ||
