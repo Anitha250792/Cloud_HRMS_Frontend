@@ -14,19 +14,13 @@ function Login() {
   /* =====================================================
      🔐 AUTO REDIRECT IF ALREADY LOGGED IN
      ===================================================== */
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    const role = localStorage.getItem("role");
+  navigate(
+  role === "ADMIN" || role === "HR"
+    ? "/admin-dashboard"
+    : "/employee-dashboard",
+  { replace: true }
+);
 
-    if (token && role) {
-      navigate(
-        role === "ADMIN" || role === "HR"
-          ? "/admin-dashboard"
-          : "/employee-dashboard",
-        { replace: true }
-      );
-    }
-  }, [navigate]);
 
   /* =====================================================
      🔑 LOGIN HANDLER

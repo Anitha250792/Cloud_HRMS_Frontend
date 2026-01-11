@@ -3,19 +3,23 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 function RequireAuth() {
   const location = useLocation();
 
-  const access = localStorage.getItem("access");
+  const token = localStorage.getItem("access");
   const role = localStorage.getItem("role");
 
-  // 🔴 Not logged in → go to login
-  if (!access) {
+  // ❌ Not logged in → login
+  if (!token || !role) {
     return <Navigate to="/login" replace />;
   }
 
-  // 🔵 Logged in but on wrong dashboard → redirect by role
-  if (location.pathname === "/") {
+  // ✅ Logged in but trying to access /login
+  if (location.pathname === "/login") {
     return (
       <Navigate
-        to={role === "HR" ? "/admin-dashboard" : "/employee-dashboard"}
+        to={
+          role === "ADMIN" || role === "HR"
+            ? "/admin-dashboard"
+            : "/employee-dashboard"
+        }
         replace
       />
     );

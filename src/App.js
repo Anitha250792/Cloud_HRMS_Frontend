@@ -68,54 +68,54 @@ function AppLayout() {
       {!hideSidebar && <Sidebar />}
 
       <main
-        style={{
-          marginLeft: hideSidebar ? 0 : SIDEBAR_WIDTH,
-          minHeight: "100vh",
-          padding: 24,
-          background: "#F8FAFC",
-        }}
-      >
-        <Routes>
-          {/* PUBLIC */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+  style={{
+    marginLeft: hideSidebar ? 0 : SIDEBAR_WIDTH,
+    minHeight: "100vh",
+    padding: 24,
+    background: "#F8FAFC",
+  }}
+>
+  <Routes>
+    {/* PUBLIC ROUTES */}
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/verify-otp" element={<VerifyOTP />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* PROTECTED */}
-          <Route element={<RequireAuth />}>
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+    {/* PROTECTED ROUTES */}
+    <Route element={<RequireAuth />}>
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
 
-            <Route path="/employees" element={<EmployeeList />} />
-            <Route path="/employees/add" element={<AddEmployee />} />
-            <Route path="/employees/edit/:id" element={<EditEmployee />} />
-            <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
-            <Route path="/employees/detail/:id" element={<EmployeeDetail />} />
-            <Route path="/employees/view/:id" element={<EmployeeView />} />
-            <Route path="/employees/directory" element={<EmployeeDirectory />} />
+      <Route path="/employees" element={<EmployeeList />} />
+      <Route path="/employees/add" element={<AddEmployee />} />
+      <Route path="/employees/edit/:id" element={<EditEmployee />} />
+      <Route path="/employees/salary/:id" element={<EmployeeSalary />} />
+      <Route path="/employees/detail/:id" element={<EmployeeDetail />} />
+      <Route path="/employees/view/:id" element={<EmployeeView />} />
+      <Route path="/employees/directory" element={<EmployeeDirectory />} />
 
-            <Route path="/payroll" element={<PayrollList />} />
-            <Route path="/payroll/add" element={<AddPayroll />} />
+      <Route path="/payroll" element={<PayrollList />} />
+      <Route path="/payroll/add" element={<AddPayroll />} />
 
-            <Route path="/attendance" element={<AttendanceList />} />
-            <Route path="/attendance/actions" element={<AttendanceActions />} />
-            <Route
-              path="/attendance/working-hours"
-              element={<HRWorkingHours />}
-            />
+      <Route path="/attendance" element={<AttendanceList />} />
+      <Route path="/attendance/actions" element={<AttendanceActions />} />
+      <Route
+        path="/attendance/working-hours"
+        element={<HRWorkingHours />}
+      />
 
-            <Route path="/leave/my" element={<MyLeaves />} />
-            <Route path="/leave/apply" element={<ApplyLeave />} />
-            <Route path="/leave/approve" element={<ApproveLeave />} />
-          </Route>
+      <Route path="/leave/my" element={<MyLeaves />} />
+      <Route path="/leave/apply" element={<ApplyLeave />} />
+      <Route path="/leave/approve" element={<ApproveLeave />} />
+    </Route>
 
-          {/* FALLBACK */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </main>
+    {/* FALLBACK */}
+    <Route path="*" element={<Navigate to="/login" replace />} />
+  </Routes>
+</main>
+
     </>
   );
 }
