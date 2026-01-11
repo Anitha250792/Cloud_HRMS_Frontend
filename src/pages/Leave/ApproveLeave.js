@@ -4,6 +4,7 @@ import api from "../../api/api";
 function ApproveLeave() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadLeaves();
@@ -11,10 +12,12 @@ function ApproveLeave() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("leave/");
-      setLeaves(res.data.filter(l => l.status === "PENDING"));
+      const res = await api.get("leave/pending/");
+      setLeaves(Array.isArray(res.data) ? res.data : []);
+      setError("");
     } catch (err) {
-      console.error(err);
+      console.error("Load leaves failed", err);
+      setError("Unable to load leave requests");
     } finally {
       setLoading(false);
     }
@@ -31,12 +34,15 @@ function ApproveLeave() {
   };
 
   if (loading) return <p>Loading leaves...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div style={page}>
-      <h2 style={title}>🛂 Leave Approvals</h2>
+    <div style={{ padding: 24 }}>
+      <h2 style={{ fontSize: 26, fontWeight: 800 }}>🛂 Leave Approvals</h2>
 
-      <table style={table}>
+      {leaves.length === 0 && <p>No pending leave requests</p>}
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th>Emp Code</th>
@@ -57,10 +63,16 @@ function ApproveLeave() {
               <td>{l.start_date} → {l.end_date}</td>
               <td>{l.reason}</td>
               <td>
-                <button style={approveBtn} onClick={() => approveLeave(l.id)}>
+                <button
+                  style={approveBtn}
+                  onClick={() => approveLeave(l.id)}
+                >
                   Approve
                 </button>
-                <button style={rejectBtn} onClick={() => rejectLeave(l.id)}>
+                <button
+                  style={rejectBtn}
+                  onClick={() => rejectLeave(l.id)}
+                >
                   Reject
                 </button>
               </td>
@@ -73,33 +85,6 @@ function ApproveLeave() {
 }
 
 export default ApproveLeave;
-
-
-const page = { padding: 24 };
-const title = { fontSize: 26, fontWeight: 800 };
-
-const table = {
-  width: "100%",
-  borderCollapse: "collapse",
-};
-
-const status = (s) => ({
-  padding: "4px 10px",
-  borderRadius: 8,
-  fontWeight: 700,
-  color:
-    s === "APPROVED"
-      ? "#065F46"
-      : s === "REJECTED"
-      ? "#7F1D1D"
-      : "#92400E",
-  background:
-    s === "APPROVED"
-      ? "#D1FAE5"
-      : s === "REJECTED"
-      ? "#FEE2E2"
-      : "#FEF3C7",
-});
 
 const approveBtn = {
   background: "#16A34A",
