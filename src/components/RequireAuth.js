@@ -1,30 +1,32 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
+function isTokenExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 function RequireAuth() {
   const location = useLocation();
-
   const token = localStorage.getItem("access");
   const role = localStorage.getItem("role");
 
-  // ❌ Not logged in → login
+  // ❌ Not logged in
   if (!token || !role) {
+    localStorage.clear();
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // ❌ Token expired
+  if (isTokenExpired(token)) {
+    localStorage.clear();
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ Logged in but trying to access /login
-  if (location.pathname === "/login") {
-    return (
-      <Navigate
-        to={
-          role === "ADMIN" || role === "HR"
-            ? "/admin-dashboard"
-            : "/employee-dashboard"
-        }
-        replace
-      />
-    );
-  }
-
+  // ✅ Logged in
   return <Outlet />;
 }
 

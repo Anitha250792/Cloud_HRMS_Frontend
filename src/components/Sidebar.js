@@ -35,16 +35,11 @@ function Sidebar() {
   /* 🔐 Load user safely */
   useEffect(() => {
   const storedRole = localStorage.getItem("role");
-  const storedName = localStorage.getItem("username");
-
-  if (!storedRole) {
-    navigate("/login", { replace: true });
-    return;
-  }
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   setRole(storedRole);
-  setUsername(storedName || "User");
-}, [navigate]);
+  setUsername(storedUser?.email || "User");
+}, []);
 
 
   const toggleMenu = (menu) => {
@@ -59,11 +54,6 @@ function Sidebar() {
     localStorage.clear();
     navigate("/login", { replace: true });
   };
-
-  if (!role || !["HR", "EMPLOYEE"].includes(role)) {
-  navigate("/login", { replace: true });
-  return null;
-}
 
 
   return (
