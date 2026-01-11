@@ -7,8 +7,6 @@ import {
 
 import Sidebar from "./components/Sidebar";
 import RequireAuth from "./components/RequireAuth";
-import ErrorBoundary from "./components/ErrorBoundary";
-
 
 /* AUTH */
 import Login from "./pages/Auth/Login";
@@ -57,7 +55,13 @@ function AppLayout() {
     "/reset-password",
   ];
 
-  const hideSidebar = authRoutes.includes(location.pathname);
+  // ✅ HASH ROUTER SAFE PATH
+  const currentPath =
+    location.pathname === "/" && location.hash
+      ? location.hash.replace("#", "")
+      : location.pathname;
+
+  const hideSidebar = authRoutes.includes(currentPath);
 
   return (
     <>
@@ -98,14 +102,17 @@ function AppLayout() {
 
             <Route path="/attendance" element={<AttendanceList />} />
             <Route path="/attendance/actions" element={<AttendanceActions />} />
-            <Route path="/attendance/working-hours" element={<HRWorkingHours />} />
+            <Route
+              path="/attendance/working-hours"
+              element={<HRWorkingHours />}
+            />
 
             <Route path="/leave/my" element={<MyLeaves />} />
             <Route path="/leave/apply" element={<ApplyLeave />} />
             <Route path="/leave/approve" element={<ApproveLeave />} />
           </Route>
 
-          {/* CATCH ALL */}
+          {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
