@@ -85,10 +85,8 @@ api.interceptors.response.use(
 -------------------------------------------------- */
 function logout() {
   localStorage.clear();
-
-  if (window.location.pathname !== "/login") {
-    window.location.replace("/login");
-  }
+  window.location.hash = "#/login";
 }
+
 
 export default api;

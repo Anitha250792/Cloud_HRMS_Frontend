@@ -14,19 +14,18 @@ function RequireAuth() {
   const token = localStorage.getItem("access");
   const role = localStorage.getItem("role");
 
-  // ❌ Not logged in
+  // ⛔ Not logged in
   if (!token || !role) {
-    localStorage.clear();
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  // ❌ Token expired
+  // ⛔ Token expired
   if (isTokenExpired(token)) {
     localStorage.clear();
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ Logged in
+  // ✅ Auth OK
   return <Outlet />;
 }
 

@@ -38,7 +38,11 @@ function Sidebar() {
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
   setRole(storedRole);
-  setUsername(storedUser?.email || "User");
+  setUsername(
+  storedUser?.name?.charAt(0).toUpperCase() ||       
+  storedUser?.email ||      
+  "User"
+);
 }, []);
 
 
@@ -54,6 +58,7 @@ function Sidebar() {
     localStorage.clear();
     navigate("/login", { replace: true });
   };
+ if (!role) return null;
 
 
   return (
