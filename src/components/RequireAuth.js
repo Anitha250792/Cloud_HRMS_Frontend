@@ -1,35 +1,27 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-export default function RequireAuth() {
-  const [loading, setLoading] = useState(true);
-  const [allowed, setAllowed] = useState(false);
+function RequireAuth() {
+  const location = useLocation();
 
-  useEffect(() => {
-    const access = localStorage.getItem("access");
-    const role = localStorage.getItem("role");
+  const access = localStorage.getItem("access");
+  const role = localStorage.getItem("role");
 
-    if (access && role) {
-      setAllowed(true);
-    } else {
-      setAllowed(false);
-    }
-
-    setLoading(false);
-  }, []);
-
-  // 🔑 IMPORTANT: NEVER return null
-  if (loading) {
-    return (
-      <div style={{ padding: 40, textAlign: "center" }}>
-        Checking authentication…
-      </div>
-    );
+  // 🔴 Not logged in → go to login
+  if (!access) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (!allowed) {
-    return <Navigate to="/login" replace />;
+  // 🔵 Logged in but on wrong dashboard → redirect by role
+  if (location.pathname === "/") {
+    return (
+      <Navigate
+        to={role === "HR" ? "/admin-dashboard" : "/employee-dashboard"}
+        replace
+      />
+    );
   }
 
   return <Outlet />;
 }
+
+export default RequireAuth;

@@ -1,16 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import { authStyles as s } from "./authStyles";
 
 function Login() {
   const navigate = useNavigate();
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
+  /* =====================================================
+     🔐 AUTO REDIRECT IF ALREADY LOGGED IN
+     ===================================================== */
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+    const role = localStorage.getItem("role");
+
+    if (token && role) {
+      navigate(
+        role === "ADMIN" || role === "HR"
+          ? "/admin-dashboard"
+          : "/employee-dashboard",
+        { replace: true }
+      );
+    }
+  }, [navigate]);
+
+  /* =====================================================
+     🔑 LOGIN HANDLER
+     ===================================================== */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -22,16 +42,15 @@ function Login() {
         password: form.password,
       });
 
-      // ✅ Save tokens
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      const { access, refresh, role, user } = res.data;
 
-      // ✅ Save role + user
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // ✅ Save auth data
+      localStorage.setItem("access", access);
+      localStorage.setItem("refresh", refresh);
+      localStorage.setItem("role", role);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      const role = res.data.role;
-
+      // ✅ Redirect by role
       navigate(
         role === "ADMIN" || role === "HR"
           ? "/admin-dashboard"
@@ -45,6 +64,9 @@ function Login() {
     }
   };
 
+  /* =====================================================
+     🧾 UI
+     ===================================================== */
   return (
     <div style={s.page}>
       <div style={s.card}>
@@ -61,7 +83,9 @@ function Login() {
             style={s.input}
             required
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
           />
 
           <div style={s.field}>
