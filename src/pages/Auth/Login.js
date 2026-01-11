@@ -42,9 +42,16 @@ function Login() {
       localStorage.setItem("refresh", res.data.refresh);
 
       // ✅ Save role + user
-      const userRole = res.data.role;
-      localStorage.setItem("role", userRole);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // TEMP SAFE ROLE (until backend sends role)
+const userRole = "EMPLOYEE"; // default
+localStorage.setItem("role", userRole);
+
+// OPTIONAL minimal user object
+localStorage.setItem(
+  "user",
+  JSON.stringify({ email: form.email })
+);
+
 
       // ✅ Redirect by role
       navigate(

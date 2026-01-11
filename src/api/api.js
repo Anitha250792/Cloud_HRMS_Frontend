@@ -5,7 +5,7 @@ import axios from "axios";
 -------------------------------------------------- */
 const api = axios.create({
   baseURL: "https://cloud-hrms-1.onrender.com/api/",
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
