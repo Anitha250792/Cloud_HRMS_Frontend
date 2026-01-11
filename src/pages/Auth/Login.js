@@ -6,25 +6,26 @@ import { authStyles as s } from "./authStyles";
 function Login() {
   const navigate = useNavigate();
 
+  /* 🔒 Auto-redirect if already logged in */
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+    const storedRole = localStorage.getItem("role");
+
+    if (token && storedRole) {
+      navigate(
+        storedRole === "ADMIN" || storedRole === "HR"
+          ? "/admin-dashboard"
+          : "/employee-dashboard",
+        { replace: true }
+      );
+    }
+  }, [navigate]);
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  /* =====================================================
-     🔐 AUTO REDIRECT IF ALREADY LOGGED IN
-     ===================================================== */
-  navigate(
-  role === "ADMIN" || role === "HR"
-    ? "/admin-dashboard"
-    : "/employee-dashboard",
-  { replace: true }
-);
-
-
-  /* =====================================================
-     🔑 LOGIN HANDLER
-     ===================================================== */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -36,17 +37,18 @@ function Login() {
         password: form.password,
       });
 
-      const { access, refresh, role, user } = res.data;
+      // ✅ Save tokens
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
 
-      // ✅ Save auth data
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
-      localStorage.setItem("role", role);
-      localStorage.setItem("user", JSON.stringify(user));
+      // ✅ Save role + user
+      const userRole = res.data.role;
+      localStorage.setItem("role", userRole);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // ✅ Redirect by role
       navigate(
-        role === "ADMIN" || role === "HR"
+        userRole === "ADMIN" || userRole === "HR"
           ? "/admin-dashboard"
           : "/employee-dashboard",
         { replace: true }
@@ -58,9 +60,6 @@ function Login() {
     }
   };
 
-  /* =====================================================
-     🧾 UI
-     ===================================================== */
   return (
     <div style={s.page}>
       <div style={s.card}>
