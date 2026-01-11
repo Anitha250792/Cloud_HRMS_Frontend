@@ -12,39 +12,38 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const res = await api.post("auth/login/", {
-      email: form.email,
-      password: form.password,
-    });
+    try {
+      const res = await api.post("auth/login/", {
+        email: form.email,
+        password: form.password,
+      });
 
-    // ✅ TOKENS
-    localStorage.setItem("access", res.data.access);
-    localStorage.setItem("refresh", res.data.refresh);
+      // ✅ Save tokens
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
 
-    // ✅ ROLE
-    localStorage.setItem("role", res.data.role);
+      // ✅ Save role + user
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-    // ✅ USER (THIS WAS MISSING ❗)
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+      const role = res.data.role;
 
-    navigate(
-      res.data.role === "HR"
-        ? "/admin-dashboard"
-        : "/employee-dashboard",
-      { replace: true }
-    );
-  } catch (err) {
-    setError("Invalid email or password ❌");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      navigate(
+        role === "ADMIN" || role === "HR"
+          ? "/admin-dashboard"
+          : "/employee-dashboard",
+        { replace: true }
+      );
+    } catch (err) {
+      setError("Invalid email or password ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={s.page}>
