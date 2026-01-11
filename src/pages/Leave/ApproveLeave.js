@@ -12,11 +12,13 @@ function ApproveLeave() {
 
   const loadLeaves = async () => {
     try {
-      const res = await api.get("leave/pending/");
-      setLeaves(Array.isArray(res.data) ? res.data : []);
-      setError("");
+      const res = await api.get("leave/");
+      const pending = Array.isArray(res.data)
+        ? res.data.filter(l => l.status === "PENDING")
+        : [];
+      setLeaves(pending);
     } catch (err) {
-      console.error("Load leaves failed", err);
+      console.error(err);
       setError("Unable to load leave requests");
     } finally {
       setLoading(false);
@@ -24,57 +26,52 @@ function ApproveLeave() {
   };
 
   const approveLeave = async (id) => {
-    await api.post(`leave/${id}/approve/`);
-    loadLeaves();
+    try {
+      await api.post(`leave/${id}/approve/`);
+      loadLeaves();
+    } catch (err) {
+      alert(err.response?.data?.error || "Approval failed");
+    }
   };
 
   const rejectLeave = async (id) => {
-    await api.post(`leave/${id}/reject/`);
-    loadLeaves();
+    try {
+      await api.post(`leave/${id}/reject/`);
+      loadLeaves();
+    } catch (err) {
+      alert(err.response?.data?.error || "Rejection failed");
+    }
   };
 
-  if (loading) return <p>Loading leaves...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div style={{ padding: 24 }}>
-      <h2 style={{ fontSize: 26, fontWeight: 800 }}>🛂 Leave Approvals</h2>
+      <h2>🛂 Leave Approvals</h2>
 
-      {leaves.length === 0 && <p>No pending leave requests</p>}
+      {leaves.length === 0 && <p>No pending requests</p>}
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table width="100%">
         <thead>
           <tr>
-            <th>Emp Code</th>
-            <th>Name</th>
+            <th>Employee</th>
             <th>Type</th>
             <th>Dates</th>
             <th>Reason</th>
             <th>Action</th>
           </tr>
         </thead>
-
         <tbody>
-          {leaves.map((l) => (
+          {leaves.map(l => (
             <tr key={l.id}>
-              <td>{l.emp_code}</td>
-              <td>{l.employee_name}</td>
+              <td>{l.employee_name || "—"}</td>
               <td>{l.leave_type}</td>
               <td>{l.start_date} → {l.end_date}</td>
               <td>{l.reason}</td>
               <td>
-                <button
-                  style={approveBtn}
-                  onClick={() => approveLeave(l.id)}
-                >
-                  Approve
-                </button>
-                <button
-                  style={rejectBtn}
-                  onClick={() => rejectLeave(l.id)}
-                >
-                  Reject
-                </button>
+                <button onClick={() => approveLeave(l.id)}>Approve</button>
+                <button onClick={() => rejectLeave(l.id)}>Reject</button>
               </td>
             </tr>
           ))}
@@ -85,6 +82,7 @@ function ApproveLeave() {
 }
 
 export default ApproveLeave;
+
 
 const approveBtn = {
   background: "#16A34A",
