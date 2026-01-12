@@ -18,9 +18,15 @@ api.interceptors.request.use(
   (config) => {
     const access = localStorage.getItem("access");
 
-    if (access) {
-      config.headers.Authorization = `Bearer ${access}`;
-    }
+    if (
+  access &&
+  !config.url.includes("auth/login") &&
+  !config.url.includes("auth/register") &&
+  !config.url.includes("auth/token")
+) {
+  config.headers.Authorization = `Bearer ${access}`;
+}
+
 
     return config;
   },
