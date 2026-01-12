@@ -18,16 +18,30 @@ function Register() {
 
   const submit = async (e) => {
     e.preventDefault();
+
     if (form.password1 !== form.password2) {
       setError("Passwords do not match ❌");
       return;
     }
 
     try {
-      await api.post("auth/register/", form);
-      navigate("/login");
-    } catch {
-      setError("Registration failed ❌");
+      await api.post("auth/register/", {
+        email: form.email,
+        password1: form.password1,
+        password2: form.password2,
+        name: form.name,
+        role: form.role,
+      });
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      const msg =
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.password1?.[0] ||
+        err.response?.data?.non_field_errors?.[0] ||
+        "Registration failed ❌";
+
+      setError(msg);
     }
   };
 
@@ -40,14 +54,31 @@ function Register() {
         {error && <div style={s.alertError}>{error}</div>}
 
         <form onSubmit={submit} style={s.form}>
-          <input style={s.input} placeholder="Full Name" required
-            onChange={(e)=>setForm({...form,name:e.target.value})} />
+          <input
+            style={s.input}
+            placeholder="Full Name"
+            required
+            onChange={(e) =>
+              setForm({ ...form, name: e.target.value })
+            }
+          />
 
-          <input style={s.input} type="email" placeholder="Email" required
-            onChange={(e)=>setForm({...form,email:e.target.value})} />
+          <input
+            style={s.input}
+            type="email"
+            placeholder="Email"
+            required
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
 
-          <select style={s.input}
-            onChange={(e)=>setForm({...form,role:e.target.value})}>
+          <select
+            style={s.input}
+            onChange={(e) =>
+              setForm({ ...form, role: e.target.value })
+            }
+          >
             <option value="EMPLOYEE">Employee</option>
             <option value="HR">HR Admin</option>
           </select>
@@ -58,9 +89,11 @@ function Register() {
               placeholder="Password"
               style={s.input}
               required
-              onChange={(e)=>setForm({...form,password1:e.target.value})}
+              onChange={(e) =>
+                setForm({ ...form, password1: e.target.value })
+              }
             />
-            <span style={s.eye} onClick={()=>setShow(!show)}>
+            <span style={s.eye} onClick={() => setShow(!show)}>
               {show ? "🙈" : "👁️"}
             </span>
           </div>
@@ -70,7 +103,9 @@ function Register() {
             placeholder="Confirm Password"
             style={s.input}
             required
-            onChange={(e)=>setForm({...form,password2:e.target.value})}
+            onChange={(e) =>
+              setForm({ ...form, password2: e.target.value })
+            }
           />
 
           <button style={s.button}>Create Account</button>
@@ -78,7 +113,9 @@ function Register() {
 
         <p style={s.bottomText}>
           Already have an account?{" "}
-          <Link to="/login" style={s.link}>Login</Link>
+          <Link to="/login" style={s.link}>
+            Login
+          </Link>
         </p>
       </div>
     </div>
