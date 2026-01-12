@@ -49,10 +49,12 @@ api.interceptors.response.use(
 
     // Only handle 401
     if (
-      error.response.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("auth/token/refresh")
-    ) {
+  error.response.status === 401 &&
+  !originalRequest._retry &&
+  !originalRequest.url.includes("auth/login") &&
+  !originalRequest.url.includes("auth/register")
+) {
+
       originalRequest._retry = true;
 
       const refresh = localStorage.getItem("refresh");
