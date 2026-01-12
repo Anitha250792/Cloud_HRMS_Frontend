@@ -33,13 +33,22 @@ function Login() {
 
     try {
       const res = await api.post("auth/login/", {
-        username: form.email, 
-        password: form.password,
-      });
+  email: form.email,
+  password: form.password,
+});
+
 
       // ✅ Save tokens
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("role", res.data.role);
+localStorage.setItem("user", JSON.stringify(res.data.user));
+
+navigate(
+  res.data.role === "HR"
+    ? "/admin-dashboard"
+    : "/employee-dashboard",
+  { replace: true }
+);
+
 
       // ✅ Save role + user
       // TEMP SAFE ROLE (until backend sends role)
