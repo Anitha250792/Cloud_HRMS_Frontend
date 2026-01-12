@@ -33,9 +33,9 @@ function Login() {
 
     try {
       const res = await api.post("auth/login/", {
-  email: form.email,
-  password: form.password,
-});
+        email: form.email,
+        password: form.password,
+      });
 
 
       // ✅ Save tokens
