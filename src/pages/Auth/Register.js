@@ -35,14 +35,14 @@ function Register() {
 
       navigate("/login", { replace: true });
     } catch (err) {
-      const msg =
-        err.response?.data?.email?.[0] ||
-        err.response?.data?.password1?.[0] ||
-        err.response?.data?.non_field_errors?.[0] ||
-        "Registration failed ❌";
+  const msg =
+    err.response?.data?.password ||
+    err.response?.data?.non_field_errors ||
+    "Registration failed ❌";
 
-      setError(msg);
-    }
+  setError(
+    Array.isArray(msg) ? msg[0] : msg
+  );}
   };
 
   return (
