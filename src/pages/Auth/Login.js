@@ -6,14 +6,14 @@ import { authStyles as s } from "./authStyles";
 function Login() {
   const navigate = useNavigate();
 
-  /* 🔒 Auto-redirect if already logged in */
+  /* 🔒 Auto redirect if already logged in */
   useEffect(() => {
     const token = localStorage.getItem("access");
-    const storedRole = localStorage.getItem("role");
+    const role = localStorage.getItem("role");
 
-    if (token && storedRole) {
+    if (token && role) {
       navigate(
-        storedRole === "ADMIN" || storedRole === "HR"
+        role === "HR" || role === "ADMIN"
           ? "/admin-dashboard"
           : "/employee-dashboard",
         { replace: true }
@@ -26,51 +26,38 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  /* 🔑 LOGIN HANDLER */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await api.post("auth/login/", {
+      const res = await api.post("/auth/login/", {
         email: form.email,
         password: form.password,
       });
 
+      // ✅ SAVE TOKENS
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
 
-      // ✅ Save tokens
+      // ✅ SAVE USER + ROLE
       localStorage.setItem("role", res.data.role);
-localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-navigate(
-  res.data.role === "HR"
-    ? "/admin-dashboard"
-    : "/employee-dashboard",
-  { replace: true }
-);
+      // ✅ ROLE BASED REDIRECT
+      if (res.data.role === "HR" || res.data.role === "ADMIN") {
+        navigate("/admin-dashboard", { replace: true });
+      } else {
+        navigate("/employee-dashboard", { replace: true });
+      }
 
-
-      // ✅ Save role + user
-      // TEMP SAFE ROLE (until backend sends role)
-const userRole = "EMPLOYEE"; // default
-localStorage.setItem("role", userRole);
-
-// OPTIONAL minimal user object
-localStorage.setItem(
-  "user",
-  JSON.stringify({ email: form.email })
-);
-
-
-      // ✅ Redirect by role
-      navigate(
-        userRole === "ADMIN" || userRole === "HR"
-          ? "/admin-dashboard"
-          : "/employee-dashboard",
-        { replace: true }
-      );
     } catch (err) {
-      setError("Invalid email or password ❌");
+      setError(
+        err.response?.data?.non_field_errors?.[0] ||
+        "Invalid email or password ❌"
+      );
     } finally {
       setLoading(false);
     }
@@ -80,6 +67,7 @@ localStorage.setItem(
     <div style={s.page}>
       <div style={s.card}>
         <div style={s.icon}>🔒</div>
+
         <h2 style={s.title}>Login</h2>
         <p style={s.subtitle}>Login to access HRMS</p>
 

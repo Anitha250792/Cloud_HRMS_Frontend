@@ -4,29 +4,29 @@ import axios from "axios";
    AXIOS INSTANCE
 -------------------------------------------------- */
 const api = axios.create({
-  baseURL: "https://cloud-hrms-1.onrender.com/api/",
-  timeout: 30000,
+  baseURL: "https://cloud-hrms-1.onrender.com/api",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 /* -------------------------------------------------
-   REQUEST INTERCEPTOR (Attach JWT)
+   REQUEST INTERCEPTOR (Attach JWT safely)
 -------------------------------------------------- */
 api.interceptors.request.use(
   (config) => {
     const access = localStorage.getItem("access");
 
+    // Do NOT attach token to auth endpoints
     if (
-  access &&
-  !config.url.includes("auth/login") &&
-  !config.url.includes("auth/register") &&
-  !config.url.includes("auth/token")
-) {
-  config.headers.Authorization = `Bearer ${access}`;
-}
-
+      access &&
+      !config.url.includes("/auth/login/") &&
+      !config.url.includes("/auth/register/") &&
+      !config.url.includes("/auth/token/")
+    ) {
+      config.headers.Authorization = `Bearer ${access}`;
+    }
 
     return config;
   },
@@ -34,34 +34,29 @@ api.interceptors.request.use(
 );
 
 /* -------------------------------------------------
-   RESPONSE INTERCEPTOR (Auto Refresh Token)
+   RESPONSE INTERCEPTOR (Refresh token on 401)
 -------------------------------------------------- */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Network / server down
+    // Backend unreachable
     if (!error.response) {
-      console.error("Network error", error);
+      console.error("Network error:", error.message);
       return Promise.reject(error);
     }
 
     const originalRequest = error.config;
 
-    // Only handle 401
     if (
-  error.response.status === 401 &&
-  !originalRequest._retry &&
-  !originalRequest.url.includes("auth/login") &&
-  !originalRequest.url.includes("auth/register") &&
-  !originalRequest.url.includes("auth/token/refresh")
-) {
-
-
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/login/") &&
+      !originalRequest.url.includes("/auth/register/") &&
+      !originalRequest.url.includes("/auth/token/refresh/")
+    ) {
       originalRequest._retry = true;
 
       const refresh = localStorage.getItem("refresh");
-
-      // No refresh token → force logout
       if (!refresh) {
         logout();
         return Promise.reject(error);
@@ -70,19 +65,18 @@ api.interceptors.response.use(
       try {
         const res = await axios.post(
           "https://cloud-hrms-1.onrender.com/api/auth/token/refresh/",
-          { refresh }
+          { refresh },
+          { headers: { "Content-Type": "application/json" } }
         );
 
-        // Save new access token
         localStorage.setItem("access", res.data.access);
 
-        // Retry original request
         originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
         return api(originalRequest);
 
-      } catch (refreshError) {
+      } catch (err) {
         logout();
-        return Promise.reject(refreshError);
+        return Promise.reject(err);
       }
     }
 
@@ -91,12 +85,12 @@ api.interceptors.response.use(
 );
 
 /* -------------------------------------------------
-   SAFE LOGOUT (NO BLANK PAGE)
+   LOGOUT (SAFE)
 -------------------------------------------------- */
 function logout() {
-  localStorage.clear();
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
   window.location.hash = "#/login";
 }
-
 
 export default api;
