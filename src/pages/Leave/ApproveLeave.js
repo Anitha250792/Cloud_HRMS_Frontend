@@ -11,19 +11,17 @@ function ApproveLeave() {
   }, []);
 
   const loadLeaves = async () => {
-    try {
-      const res = await api.get("leave/");
-      const pending = Array.isArray(res.data)
-        ? res.data.filter(l => l.status === "PENDING")
-        : [];
-      setLeaves(pending);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load leave requests");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const res = await api.get("leave/pending/");
+    setLeaves(res.data);
+  } catch (err) {
+    console.error(err);
+    setError("Unable to load leave requests");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const approveLeave = async (id) => {
     try {
